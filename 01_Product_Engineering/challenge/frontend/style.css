@@ -1,32 +1,35 @@
 /* PokéDex — a Game Boy Color skin.
  *
- * The outside is a Game Boy Color: a silver slab with the GAME BOY
- * COLOR faceplate logo, a charcoal screen bezel with a BATTERY
- * light, a dark cursor pad, red A/B keys, START/SELECT pills and
- * a slotted speaker. On the screen runs the Gen 1 Pokédex: the
- * dark-navy in-game LCD (header bar and all). Your messages are
- * cream GBC dialogue boxes; the Pokédex answers in blue panels.
+ * The outside is a Game Boy Color (Atomic Purple edition): a
+ * translucent purple body with the GAME BOY COLOR faceplate logo,
+ * a deep-aubergine screen bezel with a BATTERY light, a dark cursor
+ * pad, aubergine A/B keys, START/SELECT pills and a slotted speaker.
+ * On the screen runs the Gen 1 Pokédex: the dark-navy in-game LCD
+ * (header bar and all). Your messages are cream GBC dialogue boxes;
+ * the Pokédex answers in blue panels.
  *
  * Pixel aesthetic: hard edges, 2px+ borders, hard offset shadows
  * only — no blur, no soft glow, no gradients pretending to be 3D.
  */
 
 :root {
-  /* Game Boy Color shell (silver faceplate) */
-  --shell-hi: #f2f3f5;
-  --shell: #d3d6dc;
-  --shell-lo: #b4b9c2;
-  --shell-dk: #969ca9;
-  --shell-line: #565b66; /* molded / printed faceplate text */
-  --outline: #3a3e46;
+  /* Game Boy Color shell (Atomic Purple, translucent) */
+  --shell-hi: rgba(203, 182, 244, 0.92); /* light catching the thin plastic */
+  --shell: rgba(132, 98, 190, 0.88);     /* Atomic Purple, slightly see-through */
+  --shell-lo: rgba(93, 61, 143, 0.92);
+  --shell-dk: rgba(66, 42, 104, 0.94);
+  --shell-line: #2b1c4a; /* molded faceplate text (deep aubergine) */
+  --outline: #1f1433;
 
-  /* screen bezel (charcoal) */
-  --bezel: #4a4e57;
-  --bezel-deep: #33363d;
+  /* screen bezel (deep aubergine) */
+  --bezel: #2e2153;
+  --bezel-deep: #1f1638;
+  --bezel-ink: #9c8bc9;   /* "BATTERY" label on the bezel */
 
-  /* cursor pad (dark gray) */
-  --pad: #5b606a;
-  --pad-deep: #33363d;
+  /* cursor pad (near-black purple) */
+  --pad: #2a1e46;
+  --pad-deep: #191129;
+  --pad-ink: #b7a6e0;     /* arrows on the pad */
 
   /* screen (in-game Pokédex LCD) */
   --screen: #0e1a45;
@@ -44,10 +47,11 @@
   --dialog-ink: #141824;
   --dialog-dim: #7a7f92;
 
-  /* A / B keys (GBC red) */
-  --ab: #a83240;
-  --ab-hi: #c4505c;
-  --ab-dk: #641c28;
+  /* A / B keys (Atomic Purple aubergine) */
+  --ab: #4c2a66;
+  --ab-hi: #7c52a6;
+  --ab-dk: #2b163c;
+  --ab-ink: #c9b8e8;
 
   /* Pokédex red (logo, pills, errors) */
   --red: #e03a1f;
@@ -85,14 +89,20 @@ body {
 
 .device {
   width: min(600px, 100%);
-  padding: 18px 24px 22px;
-  background: var(--shell);
+  margin: 0 auto;
+  padding: 22px 22px 26px;
+  background:
+    radial-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 1.5px),
+    var(--shell);
+  background-size:
+    9px 9px,
+    auto;
   border: 3px solid var(--outline);
   border-radius: 24px 24px 34px 34px;
-  /* silver slab: bright top edge, soft lower shade, hard drop */
   box-shadow:
     inset 0 3px 0 var(--shell-hi),
-    inset 0 -10px 0 rgba(58, 62, 70, 0.16),
+    inset 0 -12px 0 rgba(43, 24, 64, 0.28),
+    inset 0 0 0 2px rgba(255, 255, 255, 0.2),
     0 12px 0 rgba(3, 6, 18, 0.55);
 }
 
@@ -161,9 +171,9 @@ body {
   width: 10px;
   height: 10px;
   flex: none;
+  border: 2px solid #171028;
   border-radius: 50%;
   background: var(--bezel-deep);
-  border: 2px solid #23262c;
 }
 .led.on {
   background: #7fe0a8;
@@ -174,7 +184,7 @@ body {
 }
 @keyframes ledblink {
   50% {
-    background: #23262c;
+    background: #171028;
   }
 }
 
@@ -182,7 +192,7 @@ body {
   font-family: var(--font-pixel);
   font-size: 7px;
   letter-spacing: 1px;
-  color: var(--shell-dk);
+  color: var(--bezel-ink);
   user-select: none;
 }
 
@@ -283,9 +293,7 @@ body {
   background: var(--dialog);
   border: 3px solid var(--dialog-line);
   border-radius: 10px;
-  box-shadow:
-    4px 4px 0 rgba(58, 62, 70, 0.45),
-    inset 0 0 0 2px #ffffff;
+  box-shadow: 4px 4px 0 rgba(31, 20, 51, 0.5), inset 0 0 0 2px #ffffff;
 }
 .textbox::placeholder {
   color: var(--dialog-dim);
@@ -316,7 +324,7 @@ body {
   padding: 0;
   font-size: 9px;
   line-height: 1;
-  color: var(--shell-dk);
+  color: var(--pad-ink);
   background: var(--pad);
   border: 2px solid var(--pad-deep);
 }
@@ -338,7 +346,7 @@ body {
 }
 .nav-arm:active {
   background: var(--pad-deep);
-  color: var(--shell);
+  color: var(--pad-ink);
 }
 
 .nav-core {
@@ -380,7 +388,7 @@ body {
 .ab-label {
   font-family: var(--font-pixel);
   font-size: 9px;
-  color: var(--shell-line);
+  color: var(--ab-ink);
   transform: skewX(-8deg);
   user-select: none;
 }
@@ -505,8 +513,8 @@ body {
   background: var(--shell-lo);
   border-radius: 3px;
   box-shadow:
-    inset 0 2px 0 rgba(58, 62, 70, 0.35),
-    inset 2px 0 0 rgba(58, 62, 70, 0.2);
+    inset 0 2px 0 rgba(26, 16, 46, 0.55),
+    inset 2px 0 0 rgba(26, 16, 46, 0.35);
 }
 
 /* ── messages ───────────────────────────────────────────────────── */
