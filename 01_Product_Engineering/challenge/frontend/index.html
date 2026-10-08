@@ -1,97 +1,112 @@
 <!doctype html>
 <html lang="en">
   <head>
-    <meta charset="utf-8" />
+    <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <!-- Rename this. It is your app. -->
-    <title>Your AI Application</title>
-    <style>
-      body {
-        font-family: system-ui, sans-serif;
-        max-width: 44rem;
-        margin: 2rem auto;
-        padding: 0 1rem;
-        line-height: 1.5;
-      }
-      #log {
-        border: 1px solid #ccc;
-        border-radius: 6px;
-        padding: 1rem;
-        min-height: 20rem;
-        margin-bottom: 1rem;
-        white-space: pre-wrap;
-        overflow-y: auto;
-      }
-      .turn { margin-bottom: 1rem; }
-      .who { font-weight: 600; }
-      form { display: flex; gap: 0.5rem; }
-      input { flex: 1; padding: 0.5rem; font: inherit; }
-      button { padding: 0.5rem 1rem; font: inherit; }
-    </style>
+    <title>PokéChat</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='45' fill='%23fff'/%3E%3Cpath d='M5 50a45 45 0 0 1 90 0Z' fill='%23d9341c'/%3E%3Ccircle cx='50' cy='50' r='45' fill='none' stroke='%231a1c20' stroke-width='7'/%3E%3Crect x='5' y='46.5' width='90' height='7' fill='%231a1c20'/%3E%3Ccircle cx='50' cy='50' r='13' fill='%23fff' stroke='%231a1c20' stroke-width='7'/%3E%3C/svg%3E"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/style.css" />
   </head>
   <body>
-    <h1>Your AI Application</h1>
-    <p>
-      This is a deliberately plain frontend. Making it good is your job — open
-      this file in VS Code and point Claude Code at it.
-    </p>
+    <main class="console">
+      <header class="header">
+        <div class="brand">
+          <p class="brand-sub">POCKET CONSOLE · MODEL NO. FDE-1</p>
+          <h1 class="brand-title">POKÉCHAT</h1>
+        </div>
+        <div class="header-right">
+          <p class="tagline">TRAINING CENTRAL<br />ASK ANYTHING</p>
+          <div class="pokeball" aria-hidden="true"></div>
+        </div>
+      </header>
 
-    <div id="log"></div>
-    <form id="form">
-      <input id="input" placeholder="Ask something..." autocomplete="off" />
-      <button type="submit">Send</button>
-    </form>
+      <div class="bezel">
+        <div
+          id="log"
+          class="screen"
+          role="log"
+          aria-live="polite"
+          aria-label="Conversation"
+          tabindex="0"
+        ></div>
+      </div>
 
-    <script type="module">
-      // NOTE: this loads the Gradio client from a public CDN. On a locked-down
-      // corporate network that request may simply fail. Worth noticing now --
-      // it is the kind of thing that turns a working demo into a broken one the
-      // moment it moves inside the firewall.
-      import { Client } from "https://cdn.jsdelivr.net/npm/@gradio/client/dist/index.min.js";
+      <div class="status-row">
+        <span id="led" class="led" aria-hidden="true"></span>
+        <span class="status-label" aria-hidden="true">POW</span>
+        <span id="model-badge" class="model-badge">MODEL: …</span>
+      </div>
 
-      const client = await Client.connect(window.location.origin);
-      const log = document.getElementById("log");
-      const form = document.getElementById("form");
-      const input = document.getElementById("input");
+      <form id="form" class="input-row">
+        <input
+          id="input"
+          class="textbox"
+          type="text"
+          maxlength="2000"
+          autocomplete="off"
+          placeholder="TYPE YOUR MESSAGE…"
+          aria-label="Message"
+        />
+        <button id="btn-a" class="btn btn-a" type="submit" aria-label="Send message">A</button>
+      </form>
 
-      // The model has no memory. This array is the entire conversation.
-      const history = [];
+      <div class="controls">
+        <div class="dpad">
+          <button class="dpad-arm u" type="button" data-dir="up" aria-label="Scroll up">▲</button>
+          <button class="dpad-arm l" type="button" data-dir="left" aria-label="Scroll to start">◀</button>
+          <span class="dpad-center" aria-hidden="true"></span>
+          <button class="dpad-arm r" type="button" data-dir="right" aria-label="Scroll to end">▶</button>
+          <button class="dpad-arm d" type="button" data-dir="down" aria-label="Scroll down">▼</button>
+        </div>
 
-      function addTurn(who, text) {
-        const div = document.createElement("div");
-        div.className = "turn";
-        div.innerHTML = `<span class="who">${who}:</span> `;
-        const span = document.createElement("span");
-        div.appendChild(span);
-        span.textContent = text;
-        log.appendChild(div);
-        log.scrollTop = log.scrollHeight;
-        return span;
-      }
+        <div class="pills">
+          <div class="pill-wrap">
+            <button
+              id="btn-select"
+              class="pill"
+              type="button"
+              aria-pressed="true"
+              aria-label="Toggle autoscroll"
+            >
+              <span class="pill-label">SELECT</span>
+            </button>
+          </div>
+          <div class="pill-wrap">
+            <button
+              id="btn-start"
+              class="pill"
+              type="button"
+              aria-pressed="true"
+              aria-label="Toggle sound"
+            >
+              <span class="pill-label">START</span>
+            </button>
+          </div>
+        </div>
 
-      form.addEventListener("submit", async (e) => {
-        e.preventDefault();
-        const message = input.value.trim();
-        if (!message) return;
-        input.value = "";
+        <button id="btn-b" class="btn btn-b" type="button" aria-label="Clear conversation">B</button>
+      </div>
 
-        addTurn("You", message);
-        const out = addTurn("Assistant", "");
+      <p class="hints">A SEND · B CLEAR · START SOUND · SELECT SCROLL</p>
 
-        // submit() streams; each event carries the reply so far.
-        let reply = "";
-        const job = client.submit("/chat", { message, history });
-        for await (const event of job) {
-          if (event.type === "data") {
-            reply = event.data[0];
-            out.textContent = reply;
-            log.scrollTop = log.scrollHeight;
-          }
-        }
+      <div class="speaker" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+    </main>
 
-        history.push({ role: "user", content: message });
-        history.push({ role: "assistant", content: reply });
-      });
-    </script>
+    <noscript>
+      <p style="text-align: center; font-family: monospace; padding: 1rem">
+        JavaScript is required — the console will not boot without it.
+      </p>
+    </noscript>
+
+    <script type="module" src="/script.js"></script>
   </body>
 </html>

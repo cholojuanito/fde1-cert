@@ -126,13 +126,13 @@ Nothing here is a waste of your time, but the emphasis shifts.
 
 ## ✅ You are ready when
 
-- [ ] `docker --version`, `git --version`, `python --version`, and `uv --version` all print something
-- [ ] `claude --version` prints a version, and `claude doctor` is happy
-- [ ] You have cloned the repository and pushed it to a repo of your own
-- [ ] `python app.py` in the Week 1 challenge serves a chat window at <http://localhost:7860>
-- [ ] `http://localhost:7860/health` returns OK
-- [ ] A session notebook opens in your browser and its setup cell prints `✅` with your model name
-- [ ] Anything that was blocked is written down in [`use_case/ecosystem.md`](../use_case/ecosystem.md)
+- [x] `docker --version`, `git --version`, `python --version`, and `uv --version` all print something
+- [x] `claude --version` prints a version, and `claude doctor` is happy
+- [x] You have cloned the repository and pushed it to a repo of your own
+- [x] `python app.py` in the Week 1 challenge serves a chat window at <http://localhost:7860>
+- [x] `http://localhost:7860/health` returns OK
+- [x] A session notebook opens in your browser and its setup cell prints `✅` with your model name
+- [x] Anything that was blocked is written down in [`use_case/ecosystem.md`](../use_case/ecosystem.md)
 
 The last box counts. It is the first entry in a file that Week 9 extends and
 Week 10 reports from.

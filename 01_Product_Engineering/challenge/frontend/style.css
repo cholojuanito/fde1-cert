@@ -1,0 +1,703 @@
+/* PokéChat — a Game Boy skin.
+ *
+ * Colors are the original DMG-007's four LCD shades (darkest -> lightest)
+ * plus the Pokédex red, on a grey handheld shell. Everything is square
+ * edges, hard offsets, and 2px+ borders: no blur, no soft shadows, no
+ * gradients pretending to be 3D — pixel aesthetic.
+ */
+
+:root {
+  /* DMG-007 LCD shades */
+  --ink: #0f380f;
+  --moss: #306230;
+  --leaf: #8bac0f;
+  --paper: #9bbc0f;
+
+  /* dialogue boxes are lighter than the field behind them */
+  --bubble: #c8dc8f;
+  --bubble-line: #e6f2b8;
+
+  /* console shell */
+  --shell-hi: #d8dadc;
+  --shell: #c3c6ca;
+  --shell-lo: #a7abad;
+  --shell-dk: #83888e;
+  --bezel: #34383d;
+  --bezel-dk: #23262a;
+  --black: #2e3136;
+  --black-dk: #1d2023;
+
+  /* Pokédex red */
+  --red: #d9341c;
+  --red-hi: #ff7a55;
+  --red-dk: #7e1c0c;
+  --white: #f4f6f2;
+
+  --font-pixel: "Press Start 2P", "Courier New", monospace;
+  --font-text: "VT323", "Courier New", monospace;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+}
+
+body {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 28px 16px;
+  font-family: var(--font-text);
+  background-color: #15171d;
+  /* faint pixel grid behind the console */
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+  background-size: 26px 26px;
+}
+
+::selection {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ---------------------------------------------------------------- *
+ * Console shell
+ * ---------------------------------------------------------------- */
+
+.console {
+  width: min(590px, 100%);
+  padding: 22px 26px 26px;
+  background: linear-gradient(180deg, var(--shell-hi), var(--shell) 40%, var(--shell-lo));
+  /* big bottom-right curve, like the DMG */
+  border: 3px solid #565b61;
+  border-radius: 22px 22px 110px 22px;
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.55),
+    inset 0 -8px 14px rgba(0, 0, 0, 0.18),
+    0 22px 40px rgba(0, 0, 0, 0.55);
+}
+
+/* Header: "GAME BOY" corner + Pokédex-red logo */
+
+.header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.brand-sub {
+  display: block;
+  margin-bottom: 7px;
+  font-family: var(--font-pixel);
+  font-size: 8px;
+  letter-spacing: 2px;
+  color: var(--shell-dk);
+}
+
+.brand-title {
+  margin: 0;
+  font-family: var(--font-pixel);
+  font-size: 17px;
+  letter-spacing: 1px;
+  color: var(--red);
+  /* white outline, hard dark drop — 8-bit logo treatment */
+  text-shadow:
+    -2px 0 0 var(--white),
+    2px 0 0 var(--white),
+    0 -2px 0 var(--white),
+    0 2px 0 var(--white),
+    -2px -2px 0 var(--white),
+    2px 2px 0 var(--white),
+    3px 3px 0 var(--red-dk);
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.tagline {
+  font-family: var(--font-pixel);
+  font-size: 6px;
+  line-height: 1.8;
+  letter-spacing: 1px;
+  color: var(--shell-dk);
+  text-align: right;
+}
+
+/* CSS pokéball */
+
+.pokeball {
+  position: relative;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 3px solid var(--black-dk);
+  background:
+    linear-gradient(var(--red) 50%, var(--white) 50%);
+  box-shadow: inset 0 3px 0 rgba(255, 255, 255, 0.25);
+  flex: none;
+}
+
+.pokeball::before {
+  content: "";
+  position: absolute;
+  left: -3px;
+  right: -3px;
+  top: 50%;
+  height: 4px;
+  transform: translateY(-50%);
+  background: var(--black-dk);
+}
+
+.pokeball::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 11px;
+  height: 11px;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  border: 3px solid var(--black-dk);
+  background: var(--white);
+}
+
+/* ---------------------------------------------------------------- *
+ * Screen
+ * ---------------------------------------------------------------- */
+
+.bezel {
+  padding: 16px 20px 18px;
+  background: var(--bezel);
+  border: 2px solid var(--bezel-dk);
+  border-radius: 16px 16px 16px 60px;
+  box-shadow:
+    inset 0 3px 8px rgba(0, 0, 0, 0.55),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.screen {
+  position: relative;
+  height: clamp(300px, 48vh, 470px);
+  overflow-y: auto;
+  padding: 16px 12px 18px;
+  background-color: var(--leaf);
+  /* scanlines over a dot matrix */
+  background-image:
+    repeating-linear-gradient(0deg, rgba(15, 56, 15, 0.06) 0 1px, transparent 1px 3px),
+    radial-gradient(rgba(15, 56, 15, 0.14) 1px, transparent 1.6px);
+  background-size:
+    auto,
+    4px 4px;
+  border: 3px solid var(--ink);
+  box-shadow: inset 0 0 18px rgba(15, 56, 15, 0.45);
+  scrollbar-width: thin;
+  scrollbar-color: var(--moss) rgba(15, 56, 15, 0.15);
+}
+
+.screen::-webkit-scrollbar {
+  width: 10px;
+}
+
+.screen::-webkit-scrollbar-track {
+  background: rgba(15, 56, 15, 0.15);
+}
+
+.screen::-webkit-scrollbar-thumb {
+  background: var(--moss);
+  border: 2px solid var(--leaf);
+}
+
+/* Power row: LED + which model is answering */
+
+.status-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 12px 2px 14px;
+}
+
+.led {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #571810;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.7);
+}
+
+.led.on {
+  background: #ff4433;
+  box-shadow:
+    0 0 8px rgba(255, 68, 51, 0.9),
+    inset 0 1px 1px rgba(255, 255, 255, 0.4);
+}
+
+.led.busy {
+  animation: ledblink 0.5s step-end infinite;
+}
+
+@keyframes ledblink {
+  50% {
+    opacity: 0.35;
+  }
+}
+
+.status-label,
+.model-badge {
+  font-family: var(--font-pixel);
+  font-size: 7px;
+  letter-spacing: 1px;
+  color: var(--shell-dk);
+}
+
+.model-badge {
+  margin-left: auto;
+}
+
+/* ---------------------------------------------------------------- *
+ * Text entry + A button
+ * ---------------------------------------------------------------- */
+
+.input-row {
+  display: flex;
+  align-items: stretch;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.textbox {
+  flex: 1;
+  min-width: 0;
+  height: 52px;
+  padding: 8px 12px;
+  font-family: var(--font-text);
+  font-size: 22px;
+  line-height: 1;
+  color: var(--ink);
+  caret-color: var(--ink);
+  background: var(--paper);
+  border: 3px solid var(--ink);
+  box-shadow: inset 0 0 0 2px var(--bubble-line);
+}
+
+.textbox::placeholder {
+  color: var(--moss);
+}
+
+.textbox:focus {
+  outline: 3px solid var(--red);
+  outline-offset: 2px;
+}
+
+/* A / B buttons */
+
+.btn {
+  display: grid;
+  place-items: center;
+  border: none;
+  border-radius: 50%;
+  color: var(--white);
+  font-family: var(--font-pixel);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  background: radial-gradient(circle at 35% 30%, var(--red-hi), var(--red) 55%, var(--red-dk));
+  box-shadow:
+    0 5px 0 var(--red-dk),
+    0 8px 10px rgba(0, 0, 0, 0.35),
+    inset 0 2px 4px rgba(255, 255, 255, 0.35);
+  text-shadow: 0 2px 0 rgba(0, 0, 0, 0.4);
+}
+
+.btn-a {
+  width: 56px;
+  height: 56px;
+  font-size: 16px;
+  flex: none;
+}
+
+.btn:active {
+  transform: translateY(4px);
+  box-shadow:
+    0 1px 0 var(--red-dk),
+    0 2px 4px rgba(0, 0, 0, 0.3),
+    inset 0 2px 4px rgba(255, 255, 255, 0.25);
+}
+
+.btn:disabled {
+  filter: grayscale(0.4) brightness(0.8);
+  cursor: default;
+  transform: none;
+}
+
+.btn:focus-visible,
+.pill:focus-visible,
+.dpad-arm:focus-visible,
+.textbox:focus-visible {
+  outline: 3px solid var(--white);
+  outline-offset: 3px;
+}
+
+/* ---------------------------------------------------------------- *
+ * Controls: D-pad, START/SELECT, B
+ * ---------------------------------------------------------------- */
+
+.controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.dpad {
+  display: grid;
+  grid-template-areas:
+    ". u ."
+    "l c r"
+    ". d .";
+  grid-template-columns: repeat(3, 24px);
+  grid-template-rows: repeat(3, 24px);
+}
+
+.dpad-arm {
+  display: grid;
+  place-items: center;
+  font-size: 8px;
+  line-height: 1;
+  color: #70767e;
+  background: var(--black);
+  border: 2px solid var(--black-dk);
+  cursor: pointer;
+}
+
+.dpad .u {
+  grid-area: u;
+  border-radius: 5px 5px 0 0;
+}
+
+.dpad .l {
+  grid-area: l;
+  border-radius: 5px 0 0 5px;
+}
+
+.dpad .r {
+  grid-area: r;
+  border-radius: 0 5px 5px 0;
+}
+
+.dpad .d {
+  grid-area: d;
+  border-radius: 0 0 5px 5px;
+}
+
+button.dpad-arm:active {
+  color: #aab0b8;
+}
+
+.dpad-center {
+  grid-area: c;
+  position: relative;
+  background: var(--black);
+  border: 2px solid var(--black-dk);
+}
+
+.dpad-center::after {
+  content: "";
+  position: absolute;
+  inset: 5px;
+  border-radius: 50%;
+  background: var(--black-dk);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+/* START / SELECT: tilted pills with a state dot */
+
+.pills {
+  display: flex;
+  gap: 26px;
+  padding: 0 6px;
+}
+
+.pill-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+}
+
+.pill {
+  position: relative;
+  width: 62px;
+  height: 15px;
+  border: none;
+  border-radius: 8px;
+  background: linear-gradient(180deg, #787d84, #5d6268);
+  box-shadow:
+    0 3px 0 #43484e,
+    inset 0 1px 1px rgba(255, 255, 255, 0.25);
+  transform: rotate(-20deg);
+  cursor: pointer;
+}
+
+.pill::after {
+  content: "";
+  position: absolute;
+  left: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #3a3e43;
+}
+
+.pill[aria-pressed="true"]::after {
+  background: #ff5040;
+  box-shadow: 0 0 5px #ff5040;
+}
+
+.pill:active {
+  transform: rotate(-20deg) translateY(2px);
+  box-shadow: 0 1px 0 #43484e;
+}
+
+.pill-label {
+  font-family: var(--font-pixel);
+  font-size: 6px;
+  line-height: 1.7;
+  letter-spacing: 1px;
+  color: var(--shell-dk);
+  text-align: center;
+}
+
+.btn-b {
+  width: 48px;
+  height: 48px;
+  font-size: 13px;
+}
+
+/* Speaker grill, riding the bottom-right curve */
+
+.speaker {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  /* compact right-aligned block so the -14deg tilt pivots next to the
+   * slats instead of lifting them into the B button */
+  width: 120px;
+  margin: 14px 0 0 auto;
+  padding-right: 4px;
+  transform: rotate(-14deg);
+}
+
+.speaker i {
+  width: 7px;
+  height: 46px;
+  border-radius: 4px;
+  background: linear-gradient(180deg, #6d7278, #4c5157);
+  box-shadow:
+    inset 0 2px 4px rgba(0, 0, 0, 0.55),
+    inset 0 -1px 1px rgba(255, 255, 255, 0.2);
+}
+
+/* ---------------------------------------------------------------- *
+ * Messages: Pokémon dialogue boxes
+ * ---------------------------------------------------------------- */
+
+.msg {
+  display: flex;
+  margin-bottom: 16px;
+}
+
+.msg-user {
+  justify-content: flex-end;
+}
+
+.bubble {
+  position: relative;
+  max-width: 100%;
+  padding: 14px 34px 20px 12px;
+  background: var(--bubble);
+  border: 3px solid var(--ink);
+  /* black frame + inner light line = the classic Pokémon box */
+  box-shadow:
+    4px 4px 0 rgba(15, 56, 15, 0.28),
+    inset 0 0 0 2px var(--bubble-line);
+}
+
+.msg-user .bubble {
+  max-width: 88%;
+  border-color: var(--red);
+  box-shadow:
+    4px 4px 0 rgba(126, 28, 12, 0.25),
+    inset 0 0 0 2px #f2c9bd;
+}
+
+.tag {
+  position: absolute;
+  top: -11px;
+  left: 10px;
+  padding: 4px 7px 3px;
+  font-family: var(--font-pixel);
+  font-size: 7px;
+  letter-spacing: 1px;
+  color: #dcefc0;
+  background: var(--moss);
+  border: 2px solid var(--ink);
+}
+
+.tag-you {
+  color: var(--white);
+  background: var(--red);
+}
+
+.tag-error {
+  color: #ffd9cf;
+  background: var(--red-dk);
+}
+
+.bubble-error {
+  background: #f3cdc2;
+  border-color: var(--red-dk);
+  box-shadow:
+    4px 4px 0 rgba(126, 28, 12, 0.3),
+    inset 0 0 0 2px #f8e3dc;
+}
+
+.bubble-error .text {
+  color: #5c130a;
+}
+
+.text {
+  margin: 0;
+  font-family: var(--font-text);
+  font-size: 22px;
+  line-height: 1.25;
+  color: var(--ink);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+/* streaming block cursor + the blinking ▼ that ends a Pokémon text box */
+
+.cursor {
+  display: inline-block;
+  width: 12px;
+  height: 20px;
+  margin-left: 3px;
+  background: var(--ink);
+  vertical-align: text-bottom;
+  animation: blink 1s step-end infinite;
+}
+
+.vmark {
+  display: none;
+  position: absolute;
+  right: 12px;
+  bottom: 8px;
+  font-family: var(--font-text);
+  font-size: 18px;
+  line-height: 1;
+  color: var(--ink);
+  animation: blink 1s step-end infinite;
+}
+
+.bubble.done .cursor {
+  display: none;
+}
+
+.bubble.done .vmark {
+  display: block;
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+/* ---------------------------------------------------------------- *
+ * Misc
+ * ---------------------------------------------------------------- */
+
+.hints {
+  margin: 0;
+  font-family: var(--font-pixel);
+  font-size: 7px;
+  line-height: 2;
+  letter-spacing: 1px;
+  color: #565d6b;
+  text-align: center;
+}
+
+@media (max-width: 520px) {
+  .console {
+    padding: 18px 16px 22px;
+    border-radius: 18px 18px 80px 18px;
+  }
+
+  .brand-title {
+    font-size: 14px;
+  }
+
+  .tagline,
+  .pokeball {
+    display: none;
+  }
+
+  .dpad {
+    grid-template-columns: repeat(3, 20px);
+    grid-template-rows: repeat(3, 20px);
+  }
+
+  .btn-a {
+    width: 48px;
+    height: 48px;
+  }
+
+  .pills {
+    gap: 16px;
+  }
+
+  .pill {
+    width: 52px;
+  }
+
+  .speaker {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+  }
+}

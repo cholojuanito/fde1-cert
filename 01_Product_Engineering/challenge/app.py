@@ -8,7 +8,7 @@ split is the point: the API is the product, the UI is disposable.
 import os
 from pathlib import Path
 
-from fastapi.responses import HTMLResponse
+from fastapi.responses import FileResponse, HTMLResponse
 from gradio import Server
 
 from llm import stream_reply
@@ -36,6 +36,24 @@ def chat(message: str, history: list | None = None) -> str:
 @app.get("/", response_class=HTMLResponse)
 def homepage() -> str:
     return FRONTEND.read_text(encoding="utf-8")
+
+
+# The HTML references these; one route per asset keeps it obvious.
+# (A StaticFiles mount would serve the whole folder, but then the URL of a
+# file is no longer a sentence you can read in the page source.)
+
+
+@app.get("/style.css")
+def style() -> FileResponse:
+    """The skin. Pure cosmetics — safe to restyle without touching the API."""
+    return FileResponse(FRONTEND.parent / "style.css", media_type="text/css")
+
+
+@app.get("/script.js")
+def script() -> FileResponse:
+    """The console: streaming, sound, and buttons. The /chat call inside is
+    the same one a Gradio UI would make, just with fewer dependencies."""
+    return FileResponse(FRONTEND.parent / "script.js", media_type="text/javascript")
 
 
 @app.get("/health")
