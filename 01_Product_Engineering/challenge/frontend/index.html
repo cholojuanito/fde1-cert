@@ -1,112 +1,118 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>PokéChat</title>
-    <link
-      rel="icon"
-      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='45' fill='%23fff'/%3E%3Cpath d='M5 50a45 45 0 0 1 90 0Z' fill='%23d9341c'/%3E%3Ccircle cx='50' cy='50' r='45' fill='none' stroke='%231a1c20' stroke-width='7'/%3E%3Crect x='5' y='46.5' width='90' height='7' fill='%231a1c20'/%3E%3Ccircle cx='50' cy='50' r='13' fill='%23fff' stroke='%231a1c20' stroke-width='7'/%3E%3C/svg%3E"
-    />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap"
-      rel="stylesheet"
-    />
-    <link rel="stylesheet" href="/style.css" />
-  </head>
-  <body>
-    <main class="console">
-      <header class="header">
-        <div class="brand">
-          <p class="brand-sub">POCKET CONSOLE · MODEL NO. FDE-1</p>
-          <h1 class="brand-title">POKÉCHAT</h1>
-        </div>
-        <div class="header-right">
-          <p class="tagline">TRAINING CENTRAL<br />ASK ANYTHING</p>
-          <div class="pokeball" aria-hidden="true"></div>
-        </div>
-      </header>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>PokéDex</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap"
+    rel="stylesheet"
+  />
+  <link rel="stylesheet" href="/style.css" />
+  <script type="module" src="/script.js"></script>
+</head>
+<body>
+  <h1 class="sr-only">PokéDex chat</h1>
+  <noscript>
+    <p style="font-family: monospace; color: #e6ecff; text-align: center">
+      The Pokédex cannot power on without JavaScript.
+    </p>
+  </noscript>
 
-      <div class="bezel">
-        <div
-          id="log"
-          class="screen"
-          role="log"
-          aria-live="polite"
-          aria-label="Conversation"
-          tabindex="0"
-        ></div>
-      </div>
+  <!-- Game Boy Color -->
+  <main class="device" aria-label="PokéDex chat on a Game Boy Color">
+    <!-- Faceplate logo -->
+    <div class="logo" aria-hidden="true">
+      <span class="logo-gb">GAME BOY</span
+      ><span class="logo-color"><i>C</i><i>O</i><i>L</i><i>O</i><i>R</i></span>
+    </div>
 
-      <div class="status-row">
+    <!-- Screen: battery light + header bar + scrolling log -->
+    <div class="bezel">
+      <div class="bezel-top">
         <span id="led" class="led" aria-hidden="true"></span>
-        <span class="status-label" aria-hidden="true">POW</span>
-        <span id="model-badge" class="model-badge">MODEL: …</span>
+        <span class="status-label">BATTERY</span>
       </div>
+      <header class="screen-head">
+        <span class="ball-icon" aria-hidden="true"></span>
+        <span class="screen-title">POKÉDEX</span>
+        <span id="model-badge" class="screen-badge"></span>
+      </header>
+      <div id="log" class="screen" role="log" aria-live="polite" tabindex="0"></div>
+    </div>
 
-      <form id="form" class="input-row">
+    <!-- Body seam -->
+    <div class="seam" aria-hidden="true"></div>
+
+    <form id="form">
+      <!-- Text entry -->
+      <div class="input-row">
         <input
           id="input"
           class="textbox"
           type="text"
           maxlength="2000"
           autocomplete="off"
-          placeholder="TYPE YOUR MESSAGE…"
-          aria-label="Message"
+          placeholder="ASK THE POKÉDEX…"
         />
-        <button id="btn-a" class="btn btn-a" type="submit" aria-label="Send message">A</button>
-      </form>
-
-      <div class="controls">
-        <div class="dpad">
-          <button class="dpad-arm u" type="button" data-dir="up" aria-label="Scroll up">▲</button>
-          <button class="dpad-arm l" type="button" data-dir="left" aria-label="Scroll to start">◀</button>
-          <span class="dpad-center" aria-hidden="true"></span>
-          <button class="dpad-arm r" type="button" data-dir="right" aria-label="Scroll to end">▶</button>
-          <button class="dpad-arm d" type="button" data-dir="down" aria-label="Scroll down">▼</button>
-        </div>
-
-        <div class="pills">
-          <div class="pill-wrap">
-            <button
-              id="btn-select"
-              class="pill"
-              type="button"
-              aria-pressed="true"
-              aria-label="Toggle autoscroll"
-            >
-              <span class="pill-label">SELECT</span>
-            </button>
-          </div>
-          <div class="pill-wrap">
-            <button
-              id="btn-start"
-              class="pill"
-              type="button"
-              aria-pressed="true"
-              aria-label="Toggle sound"
-            >
-              <span class="pill-label">START</span>
-            </button>
-          </div>
-        </div>
-
-        <button id="btn-b" class="btn btn-b" type="button" aria-label="Clear conversation">B</button>
       </div>
 
-      <p class="hints">A SEND · B CLEAR · START SOUND · SELECT SCROLL</p>
+      <!-- Cursor pad + A / B keys -->
+      <div class="deck">
+        <div class="dpad" role="group" aria-label="Scroll log">
+          <button type="button" class="nav-arm u" data-dir="up" aria-label="Page up">▲</button>
+          <button type="button" class="nav-arm l" data-dir="left" aria-label="Jump to start">◀</button>
+          <span class="nav-core" aria-hidden="true"></span>
+          <button type="button" class="nav-arm r" data-dir="right" aria-label="Jump to end">▶</button>
+          <button type="button" class="nav-arm d" data-dir="down" aria-label="Page down">▼</button>
+        </div>
+        <div class="ab">
+          <span class="ab-col col-b">
+            <span class="ab-label">B</span>
+            <button id="btn-b" class="btn-b" type="button" aria-label="Clear log"></button>
+          </span>
+          <span class="ab-col col-a">
+            <span class="ab-label">A</span>
+            <button id="btn-a" class="btn-a" type="submit" aria-label="Send message"></button>
+          </span>
+        </div>
+      </div>
+    </form>
 
-      <div class="speaker" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
-    </main>
-
-    <noscript>
-      <p style="text-align: center; font-family: monospace; padding: 1rem">
-        JavaScript is required — the console will not boot without it.
+    <!-- Base row: hints + START / SELECT + speaker -->
+    <div class="base-row">
+      <p class="hints">
+        A SEND · B CLEAR<br />
+        SPEECH SOUND · CHECK SCROLL
       </p>
-    </noscript>
-
-    <script type="module" src="/script.js"></script>
-  </body>
+      <div class="pills">
+        <span class="pill-wrap wrap-start">
+          <button
+            id="btn-start"
+            class="pill"
+            type="button"
+            aria-pressed="true"
+            aria-label="Toggle sound"
+          ></button>
+          <span class="pill-label">SPEECH</span>
+        </span>
+        <span class="pill-wrap wrap-select">
+          <button
+            id="btn-select"
+            class="pill"
+            type="button"
+            aria-pressed="true"
+            aria-label="Toggle autoscroll"
+          ></button>
+          <span class="pill-label">CHECK</span>
+        </span>
+      </div>
+      <div class="speaker" aria-hidden="true">
+        <i></i><i></i><i></i><i></i><i></i><i></i>
+      </div>
+    </div>
+  </main>
+</body>
 </html>

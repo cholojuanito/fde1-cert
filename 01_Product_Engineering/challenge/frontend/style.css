@@ -1,703 +1,715 @@
-/* PokéChat — a Game Boy skin.
+/* PokéDex — a Game Boy Color skin.
  *
- * Colors are the original DMG-007's four LCD shades (darkest -> lightest)
- * plus the Pokédex red, on a grey handheld shell. Everything is square
- * edges, hard offsets, and 2px+ borders: no blur, no soft shadows, no
- * gradients pretending to be 3D — pixel aesthetic.
+ * The outside is a Game Boy Color: a silver slab with the GAME BOY
+ * COLOR faceplate logo, a charcoal screen bezel with a BATTERY
+ * light, a dark cursor pad, red A/B keys, START/SELECT pills and
+ * a slotted speaker. On the screen runs the Gen 1 Pokédex: the
+ * dark-navy in-game LCD (header bar and all). Your messages are
+ * cream GBC dialogue boxes; the Pokédex answers in blue panels.
+ *
+ * Pixel aesthetic: hard edges, 2px+ borders, hard offset shadows
+ * only — no blur, no soft glow, no gradients pretending to be 3D.
  */
 
 :root {
-  /* DMG-007 LCD shades */
-  --ink: #0f380f;
-  --moss: #306230;
-  --leaf: #8bac0f;
-  --paper: #9bbc0f;
+  /* Game Boy Color shell (silver faceplate) */
+  --shell-hi: #f2f3f5;
+  --shell: #d3d6dc;
+  --shell-lo: #b4b9c2;
+  --shell-dk: #969ca9;
+  --shell-line: #565b66; /* molded / printed faceplate text */
+  --outline: #3a3e46;
 
-  /* dialogue boxes are lighter than the field behind them */
-  --bubble: #c8dc8f;
-  --bubble-line: #e6f2b8;
+  /* screen bezel (charcoal) */
+  --bezel: #4a4e57;
+  --bezel-deep: #33363d;
 
-  /* console shell */
-  --shell-hi: #d8dadc;
-  --shell: #c3c6ca;
-  --shell-lo: #a7abad;
-  --shell-dk: #83888e;
-  --bezel: #34383d;
-  --bezel-dk: #23262a;
-  --black: #2e3136;
-  --black-dk: #1d2023;
+  /* cursor pad (dark gray) */
+  --pad: #5b606a;
+  --pad-deep: #33363d;
 
-  /* Pokédex red */
-  --red: #d9341c;
-  --red-hi: #ff7a55;
-  --red-dk: #7e1c0c;
+  /* screen (in-game Pokédex LCD) */
+  --screen: #0e1a45;
+  --screen-deep: #0a1233;
+  --panel: #182a63;
+  --panel-line: #3e549e;
+  --head: #22327a;
+  --ink: #e6ecff;
+  --ink-dim: #8fa2d9;
+  --ink-faint: #5f74b8;
+
+  /* GBC dialogue box (you) */
+  --dialog: #f2f0e4;
+  --dialog-line: #1a2456;
+  --dialog-ink: #141824;
+  --dialog-dim: #7a7f92;
+
+  /* A / B keys (GBC red) */
+  --ab: #a83240;
+  --ab-hi: #c4505c;
+  --ab-dk: #641c28;
+
+  /* Pokédex red (logo, pills, errors) */
+  --red: #e03a1f;
+  --red-hi: #ff6a3d;
+  --red-dk: #8c1a0a;
+  --red-deep: #4a1a12;
+  --red-deep-ink: #24090d;
   --white: #f4f6f2;
+  --dark: #141824;
 
   --font-pixel: "Press Start 2P", "Courier New", monospace;
   --font-text: "VT323", "Courier New", monospace;
 }
 
-* {
-  box-sizing: border-box;
-}
+/* ── page ───────────────────────────────────────────────────────── */
 
-html,
-body {
+* {
   margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 body {
   min-height: 100vh;
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 14px;
-  padding: 28px 16px;
-  font-family: var(--font-text);
-  background-color: #15171d;
-  /* faint pixel grid behind the console */
-  background-image:
-    linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+  padding: 34px 14px;
+  background-color: #070b1d;
+  background-image: radial-gradient(rgba(230, 236, 255, 0.05) 1px, transparent 1.5px);
   background-size: 26px 26px;
 }
 
-::selection {
-  background: var(--ink);
-  color: var(--paper);
-}
+/* ── Game Boy Color shell ───────────────────────────────────────── */
 
-.sr-only {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  margin: -1px;
-  padding: 0;
-  overflow: hidden;
-  clip: rect(0 0 0 0);
-  white-space: nowrap;
-  border: 0;
-}
-
-/* ---------------------------------------------------------------- *
- * Console shell
- * ---------------------------------------------------------------- */
-
-.console {
-  width: min(590px, 100%);
-  padding: 22px 26px 26px;
-  background: linear-gradient(180deg, var(--shell-hi), var(--shell) 40%, var(--shell-lo));
-  /* big bottom-right curve, like the DMG */
-  border: 3px solid #565b61;
-  border-radius: 22px 22px 110px 22px;
+.device {
+  width: min(600px, 100%);
+  padding: 18px 24px 22px;
+  background: var(--shell);
+  border: 3px solid var(--outline);
+  border-radius: 24px 24px 34px 34px;
+  /* silver slab: bright top edge, soft lower shade, hard drop */
   box-shadow:
-    inset 0 2px 0 rgba(255, 255, 255, 0.55),
-    inset 0 -8px 14px rgba(0, 0, 0, 0.18),
-    0 22px 40px rgba(0, 0, 0, 0.55);
+    inset 0 3px 0 var(--shell-hi),
+    inset 0 -10px 0 rgba(58, 62, 70, 0.16),
+    0 12px 0 rgba(3, 6, 18, 0.55);
 }
 
-/* Header: "GAME BOY" corner + Pokédex-red logo */
-
-.header {
+/* faceplate logo: GAME BOY (charcoal) + COLOR (rainbow), italic */
+.logo {
   display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 14px;
+  align-items: baseline;
+  gap: 8px;
+  margin: 0 4px 14px;
+  transform: skewX(-8deg);
+  user-select: none;
 }
-
-.brand-sub {
-  display: block;
-  margin-bottom: 7px;
+.logo-gb {
   font-family: var(--font-pixel);
-  font-size: 8px;
-  letter-spacing: 2px;
-  color: var(--shell-dk);
-}
-
-.brand-title {
-  margin: 0;
-  font-family: var(--font-pixel);
-  font-size: 17px;
+  font-size: 13px;
+  font-weight: 700;
   letter-spacing: 1px;
-  color: var(--red);
-  /* white outline, hard dark drop — 8-bit logo treatment */
-  text-shadow:
-    -2px 0 0 var(--white),
-    2px 0 0 var(--white),
-    0 -2px 0 var(--white),
-    0 2px 0 var(--white),
-    -2px -2px 0 var(--white),
-    2px 2px 0 var(--white),
-    3px 3px 0 var(--red-dk);
+  color: var(--shell-line);
 }
-
-.header-right {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.tagline {
+.logo-color {
   font-family: var(--font-pixel);
-  font-size: 6px;
-  line-height: 1.8;
+  font-size: 13px;
   letter-spacing: 1px;
-  color: var(--shell-dk);
-  text-align: right;
+}
+.logo-color i {
+  font-style: normal;
+}
+.logo-color i:nth-child(1) {
+  color: #d93425;
+}
+.logo-color i:nth-child(2) {
+  color: #f07d1a;
+}
+.logo-color i:nth-child(3) {
+  color: #e8b400;
+}
+.logo-color i:nth-child(4) {
+  color: #3ba243;
+}
+.logo-color i:nth-child(5) {
+  color: #2f6fd6;
 }
 
-/* CSS pokéball */
-
-.pokeball {
-  position: relative;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  border: 3px solid var(--black-dk);
-  background:
-    linear-gradient(var(--red) 50%, var(--white) 50%);
-  box-shadow: inset 0 3px 0 rgba(255, 255, 255, 0.25);
-  flex: none;
-}
-
-.pokeball::before {
-  content: "";
-  position: absolute;
-  left: -3px;
-  right: -3px;
-  top: 50%;
-  height: 4px;
-  transform: translateY(-50%);
-  background: var(--black-dk);
-}
-
-.pokeball::after {
-  content: "";
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 11px;
-  height: 11px;
-  transform: translate(-50%, -50%);
-  border-radius: 50%;
-  border: 3px solid var(--black-dk);
-  background: var(--white);
-}
-
-/* ---------------------------------------------------------------- *
- * Screen
- * ---------------------------------------------------------------- */
+/* ── screen bezel: battery light + LCD ──────────────────────────── */
 
 .bezel {
-  padding: 16px 20px 18px;
+  padding: 8px 10px 10px;
   background: var(--bezel);
-  border: 2px solid var(--bezel-dk);
-  border-radius: 16px 16px 16px 60px;
-  box-shadow:
-    inset 0 3px 8px rgba(0, 0, 0, 0.55),
-    inset 0 -1px 0 rgba(255, 255, 255, 0.08);
+  border: 3px solid var(--bezel-deep);
+  border-radius: 14px 14px 18px 18px;
+  /* recessed well */
+  box-shadow: inset 0 4px 0 rgba(0, 0, 0, 0.35);
 }
 
-.screen {
-  position: relative;
-  height: clamp(300px, 48vh, 470px);
-  overflow-y: auto;
-  padding: 16px 12px 18px;
-  background-color: var(--leaf);
-  /* scanlines over a dot matrix */
-  background-image:
-    repeating-linear-gradient(0deg, rgba(15, 56, 15, 0.06) 0 1px, transparent 1px 3px),
-    radial-gradient(rgba(15, 56, 15, 0.14) 1px, transparent 1.6px);
-  background-size:
-    auto,
-    4px 4px;
-  border: 3px solid var(--ink);
-  box-shadow: inset 0 0 18px rgba(15, 56, 15, 0.45);
-  scrollbar-width: thin;
-  scrollbar-color: var(--moss) rgba(15, 56, 15, 0.15);
-}
-
-.screen::-webkit-scrollbar {
-  width: 10px;
-}
-
-.screen::-webkit-scrollbar-track {
-  background: rgba(15, 56, 15, 0.15);
-}
-
-.screen::-webkit-scrollbar-thumb {
-  background: var(--moss);
-  border: 2px solid var(--leaf);
-}
-
-/* Power row: LED + which model is answering */
-
-.status-row {
+.bezel-top {
   display: flex;
   align-items: center;
   gap: 8px;
-  margin: 12px 2px 14px;
+  height: 18px;
+  padding: 0 4px 0 2px;
+  margin-bottom: 6px;
 }
 
+/* battery light: green = linked, amber blink = streaming */
 .led {
   width: 10px;
   height: 10px;
+  flex: none;
   border-radius: 50%;
-  background: #571810;
-  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.7);
+  background: var(--bezel-deep);
+  border: 2px solid #23262c;
 }
-
 .led.on {
-  background: #ff4433;
-  box-shadow:
-    0 0 8px rgba(255, 68, 51, 0.9),
-    inset 0 1px 1px rgba(255, 255, 255, 0.4);
+  background: #7fe0a8;
 }
-
 .led.busy {
-  animation: ledblink 0.5s step-end infinite;
+  background: #ffb340;
+  animation: ledblink 0.8s step-end infinite;
 }
-
 @keyframes ledblink {
   50% {
-    opacity: 0.35;
+    background: #23262c;
   }
 }
 
-.status-label,
-.model-badge {
+.status-label {
   font-family: var(--font-pixel);
   font-size: 7px;
   letter-spacing: 1px;
   color: var(--shell-dk);
+  user-select: none;
 }
 
-.model-badge {
+/* ── body seam below the bezel ──────────────────────────────────── */
+
+.seam {
+  height: 2px;
+  margin: 14px 8px 16px;
+  background: var(--shell-dk);
+  border-radius: 1px;
+  box-shadow: 0 2px 0 var(--shell-hi);
+}
+
+/* ── screen: header bar + log ───────────────────────────────────── */
+
+.screen-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 14px;
+  background: var(--head);
+  border: 3px solid var(--outline);
+  border-radius: 12px 12px 0 0;
+  border-bottom-width: 0;
+}
+
+/* little Pokéball mark */
+.ball-icon {
+  width: 18px;
+  height: 18px;
+  flex: none;
+  border-radius: 50%;
+  background: linear-gradient(
+    to bottom,
+    var(--red) 0 45%,
+    var(--dark) 45% 55%,
+    var(--white) 55% 100%
+  );
+  border: 2px solid var(--dark);
+}
+
+.screen-title {
+  font-family: var(--font-pixel);
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: var(--ink);
+}
+
+.screen-badge {
   margin-left: auto;
+  font-family: var(--font-pixel);
+  font-size: 7px;
+  letter-spacing: 1px;
+  color: var(--ink-faint);
+  max-width: 55%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-/* ---------------------------------------------------------------- *
- * Text entry + A button
- * ---------------------------------------------------------------- */
+.screen {
+  height: clamp(300px, 46vh, 450px);
+  overflow-y: auto;
+  padding: 14px;
+  background: var(--screen);
+  border: 3px solid var(--outline);
+  border-top-width: 0;
+  border-radius: 0 0 12px 12px;
+  scrollbar-color: var(--panel-line) var(--screen-deep);
+}
+.screen::-webkit-scrollbar {
+  width: 12px;
+}
+.screen::-webkit-scrollbar-track {
+  background: var(--screen-deep);
+  border-left: 2px solid var(--panel-line);
+}
+.screen::-webkit-scrollbar-thumb {
+  background: var(--panel-line);
+  border: 2px solid var(--screen-deep);
+}
+
+/* ── text entry ─────────────────────────────────────────────────── */
 
 .input-row {
   display: flex;
-  align-items: stretch;
-  gap: 14px;
-  margin-bottom: 18px;
 }
 
 .textbox {
   flex: 1;
   min-width: 0;
-  height: 52px;
-  padding: 8px 12px;
+  height: 64px;
+  padding: 8px 20px;
   font-family: var(--font-text);
   font-size: 22px;
-  line-height: 1;
-  color: var(--ink);
-  caret-color: var(--ink);
-  background: var(--paper);
-  border: 3px solid var(--ink);
-  box-shadow: inset 0 0 0 2px var(--bubble-line);
+  line-height: 1.1;
+  color: var(--dialog-ink);
+  background: var(--dialog);
+  border: 3px solid var(--dialog-line);
+  border-radius: 10px;
+  box-shadow:
+    4px 4px 0 rgba(58, 62, 70, 0.45),
+    inset 0 0 0 2px #ffffff;
 }
-
 .textbox::placeholder {
-  color: var(--moss);
+  color: var(--dialog-dim);
 }
 
-.textbox:focus {
-  outline: 3px solid var(--red);
-  outline-offset: 2px;
-}
+/* ── cursor pad + A / B keys ────────────────────────────────────── */
 
-/* A / B buttons */
-
-.btn {
-  display: grid;
-  place-items: center;
-  border: none;
-  border-radius: 50%;
-  color: var(--white);
-  font-family: var(--font-pixel);
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-  background: radial-gradient(circle at 35% 30%, var(--red-hi), var(--red) 55%, var(--red-dk));
-  box-shadow:
-    0 5px 0 var(--red-dk),
-    0 8px 10px rgba(0, 0, 0, 0.35),
-    inset 0 2px 4px rgba(255, 255, 255, 0.35);
-  text-shadow: 0 2px 0 rgba(0, 0, 0, 0.4);
-}
-
-.btn-a {
-  width: 56px;
-  height: 56px;
-  font-size: 16px;
-  flex: none;
-}
-
-.btn:active {
-  transform: translateY(4px);
-  box-shadow:
-    0 1px 0 var(--red-dk),
-    0 2px 4px rgba(0, 0, 0, 0.3),
-    inset 0 2px 4px rgba(255, 255, 255, 0.25);
-}
-
-.btn:disabled {
-  filter: grayscale(0.4) brightness(0.8);
-  cursor: default;
-  transform: none;
-}
-
-.btn:focus-visible,
-.pill:focus-visible,
-.dpad-arm:focus-visible,
-.textbox:focus-visible {
-  outline: 3px solid var(--white);
-  outline-offset: 3px;
-}
-
-/* ---------------------------------------------------------------- *
- * Controls: D-pad, START/SELECT, B
- * ---------------------------------------------------------------- */
-
-.controls {
+.deck {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 18px;
+  gap: 16px;
+  margin-top: 18px;
+  padding: 0 4px;
 }
 
 .dpad {
   display: grid;
-  grid-template-areas:
-    ". u ."
-    "l c r"
-    ". d .";
-  grid-template-columns: repeat(3, 24px);
-  grid-template-rows: repeat(3, 24px);
+  grid-template-columns: repeat(3, 26px);
+  grid-template-rows: repeat(3, 26px);
 }
-
-.dpad-arm {
-  display: grid;
-  place-items: center;
-  font-size: 8px;
+.nav-arm {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  font-size: 9px;
   line-height: 1;
-  color: #70767e;
-  background: var(--black);
-  border: 2px solid var(--black-dk);
-  cursor: pointer;
+  color: var(--shell-dk);
+  background: var(--pad);
+  border: 2px solid var(--pad-deep);
+}
+.nav-arm.u {
+  grid-area: 1 / 2;
+  border-radius: 6px 6px 0 0;
+}
+.nav-arm.l {
+  grid-area: 2 / 1;
+  border-radius: 6px 0 0 6px;
+}
+.nav-arm.r {
+  grid-area: 2 / 3;
+  border-radius: 0 6px 6px 0;
+}
+.nav-arm.d {
+  grid-area: 3 / 2;
+  border-radius: 0 0 6px 6px;
+}
+.nav-arm:active {
+  background: var(--pad-deep);
+  color: var(--shell);
 }
 
-.dpad .u {
-  grid-area: u;
-  border-radius: 5px 5px 0 0;
+.nav-core {
+  grid-area: 2 / 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--pad);
+  border: 2px solid var(--pad-deep);
 }
-
-.dpad .l {
-  grid-area: l;
-  border-radius: 5px 0 0 5px;
-}
-
-.dpad .r {
-  grid-area: r;
-  border-radius: 0 5px 5px 0;
-}
-
-.dpad .d {
-  grid-area: d;
-  border-radius: 0 0 5px 5px;
-}
-
-button.dpad-arm:active {
-  color: #aab0b8;
-}
-
-.dpad-center {
-  grid-area: c;
-  position: relative;
-  background: var(--black);
-  border: 2px solid var(--black-dk);
-}
-
-.dpad-center::after {
+.nav-core::after {
+  /* recessed center */
   content: "";
-  position: absolute;
-  inset: 5px;
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
-  background: var(--black-dk);
-  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.8);
+  background: var(--pad-deep);
+  box-shadow: inset 0 2px 0 rgba(0, 0, 0, 0.4);
 }
 
-/* START / SELECT: tilted pills with a state dot */
+/* A / B: diagonal pair, B lower-left, A higher-right */
+.ab {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.ab-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+}
+.ab-col.col-b {
+  margin-top: 12px;
+}
+.ab-col.col-a {
+  margin-bottom: 12px;
+}
+.ab-label {
+  font-family: var(--font-pixel);
+  font-size: 9px;
+  color: var(--shell-line);
+  transform: skewX(-8deg);
+  user-select: none;
+}
+
+.btn-a,
+.btn-b {
+  width: 52px;
+  height: 50px;
+  padding: 0;
+  border-radius: 50%;
+  background: var(--ab);
+  border: 3px solid var(--ab-dk);
+  box-shadow:
+    0 5px 0 var(--ab-dk),
+    inset 0 3px 0 var(--ab-hi);
+}
+.btn-a:active,
+.btn-b:active {
+  transform: translateY(4px);
+  box-shadow:
+    0 1px 0 var(--ab-dk),
+    inset 0 3px 0 var(--ab-hi);
+}
+.btn-a:disabled {
+  cursor: wait;
+  filter: grayscale(0.6);
+}
+
+/* ── base row: hints + START / SELECT + speaker ─────────────────── */
+
+.base-row {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-top: 22px;
+}
+
+.hints {
+  flex: 1;
+  font-family: var(--font-pixel);
+  font-size: 6px;
+  line-height: 1.9;
+  letter-spacing: 1px;
+  color: var(--shell-line);
+  user-select: none;
+}
 
 .pills {
   display: flex;
-  gap: 26px;
-  padding: 0 6px;
+  gap: 18px;
 }
-
 .pill-wrap {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 7px;
 }
+/* GBC diagonal: left pill lower, right pill higher */
+.pill-wrap.wrap-start {
+  margin-top: 12px;
+}
+.pill-wrap.wrap-select {
+  margin-bottom: 12px;
+}
 
 .pill {
   position: relative;
-  width: 62px;
-  height: 15px;
-  border: none;
-  border-radius: 8px;
-  background: linear-gradient(180deg, #787d84, #5d6268);
+  width: 46px;
+  height: 13px;
+  padding: 0;
+  border-radius: 7px;
+  background: var(--shell-dk);
+  border: 2px solid var(--outline);
   box-shadow:
-    0 3px 0 #43484e,
-    inset 0 1px 1px rgba(255, 255, 255, 0.25);
-  transform: rotate(-20deg);
-  cursor: pointer;
+    0 3px 0 var(--outline),
+    inset 0 1px 0 var(--shell-hi);
 }
-
 .pill::after {
+  /* state lamp */
   content: "";
   position: absolute;
-  left: 6px;
+  left: 5px;
   top: 50%;
-  transform: translateY(-50%);
   width: 5px;
   height: 5px;
+  transform: translateY(-50%);
   border-radius: 50%;
-  background: #3a3e43;
+  background: var(--outline);
 }
-
 .pill[aria-pressed="true"]::after {
-  background: #ff5040;
-  box-shadow: 0 0 5px #ff5040;
+  background: #7fe0a8;
 }
-
 .pill:active {
-  transform: rotate(-20deg) translateY(2px);
-  box-shadow: 0 1px 0 #43484e;
+  transform: translateY(2px);
+  box-shadow:
+    0 1px 0 var(--outline),
+    inset 0 1px 0 var(--shell-hi);
 }
 
 .pill-label {
   font-family: var(--font-pixel);
   font-size: 6px;
-  line-height: 1.7;
   letter-spacing: 1px;
-  color: var(--shell-dk);
-  text-align: center;
+  color: var(--shell-line);
+  transform: skewX(-8deg);
+  user-select: none;
 }
 
-.btn-b {
-  width: 48px;
-  height: 48px;
-  font-size: 13px;
-}
-
-/* Speaker grill, riding the bottom-right curve */
+/* ── speaker grille ─────────────────────────────────────────────── */
 
 .speaker {
-  display: flex;
-  gap: 8px;
-  justify-content: flex-end;
-  /* compact right-aligned block so the -14deg tilt pivots next to the
-   * slats instead of lifting them into the B button */
-  width: 120px;
-  margin: 14px 0 0 auto;
-  padding-right: 4px;
+  display: grid;
+  grid-template-columns: repeat(6, 7px);
+  gap: 6px;
+  align-items: center;
   transform: rotate(-14deg);
+  margin-right: -4px;
 }
-
 .speaker i {
   width: 7px;
-  height: 46px;
-  border-radius: 4px;
-  background: linear-gradient(180deg, #6d7278, #4c5157);
+  height: 38px;
+  background: var(--shell-lo);
+  border-radius: 3px;
   box-shadow:
-    inset 0 2px 4px rgba(0, 0, 0, 0.55),
-    inset 0 -1px 1px rgba(255, 255, 255, 0.2);
+    inset 0 2px 0 rgba(58, 62, 70, 0.35),
+    inset 2px 0 0 rgba(58, 62, 70, 0.2);
 }
 
-/* ---------------------------------------------------------------- *
- * Messages: Pokémon dialogue boxes
- * ---------------------------------------------------------------- */
+/* ── messages ───────────────────────────────────────────────────── */
 
 .msg {
+  margin-bottom: 12px;
   display: flex;
-  margin-bottom: 16px;
 }
-
 .msg-user {
   justify-content: flex-end;
 }
+.msg-ai,
+.msg-error {
+  justify-content: flex-start;
+}
 
 .bubble {
-  position: relative;
-  max-width: 100%;
-  padding: 14px 34px 20px 12px;
-  background: var(--bubble);
-  border: 3px solid var(--ink);
-  /* black frame + inner light line = the classic Pokémon box */
-  box-shadow:
-    4px 4px 0 rgba(15, 56, 15, 0.28),
-    inset 0 0 0 2px var(--bubble-line);
+  max-width: 85%;
+  border: 3px solid var(--panel-line);
+  border-radius: 10px;
+  background: var(--panel);
+  box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.35);
+  padding: 10px 14px 12px;
 }
-
-.msg-user .bubble {
-  max-width: 88%;
-  border-color: var(--red);
-  box-shadow:
-    4px 4px 0 rgba(126, 28, 12, 0.25),
-    inset 0 0 0 2px #f2c9bd;
-}
-
-.tag {
-  position: absolute;
-  top: -11px;
-  left: 10px;
-  padding: 4px 7px 3px;
+.bubble .tag {
+  display: block;
   font-family: var(--font-pixel);
   font-size: 7px;
   letter-spacing: 1px;
-  color: #dcefc0;
-  background: var(--moss);
-  border: 2px solid var(--ink);
+  color: var(--ink-dim);
+  margin-bottom: 8px;
 }
-
 .tag-you {
-  color: var(--white);
-  background: var(--red);
+  color: var(--dialog);
 }
-
 .tag-error {
-  color: #ffd9cf;
-  background: var(--red-dk);
+  color: var(--red-hi);
 }
-
-.bubble-error {
-  background: #f3cdc2;
-  border-color: var(--red-dk);
-  box-shadow:
-    4px 4px 0 rgba(126, 28, 12, 0.3),
-    inset 0 0 0 2px #f8e3dc;
-}
-
-.bubble-error .text {
-  color: #5c130a;
-}
-
-.text {
-  margin: 0;
+.bubble .text {
   font-family: var(--font-text);
   font-size: 22px;
-  line-height: 1.25;
+  line-height: 1.2;
   color: var(--ink);
   white-space: pre-wrap;
-  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
-/* streaming block cursor + the blinking ▼ that ends a Pokémon text box */
-
-.cursor {
-  display: inline-block;
-  width: 12px;
-  height: 20px;
-  margin-left: 3px;
-  background: var(--ink);
-  vertical-align: text-bottom;
-  animation: blink 1s step-end infinite;
+/* your message: cream GBC dialogue box */
+.msg-user .bubble {
+  background: var(--dialog);
+  border-color: var(--dialog-line);
+  box-shadow: 4px 4px 0 rgba(10, 18, 51, 0.55);
+}
+.msg-user .text {
+  color: var(--dialog-ink);
+}
+.msg-user .bubble .tag {
+  color: var(--dialog-dim);
+  border-color: var(--outline);
 }
 
-.vmark {
+/* Pokédex answer: blue panel with a ▼ end marker */
+.bubble .vmark {
   display: none;
-  position: absolute;
-  right: 12px;
-  bottom: 8px;
-  font-family: var(--font-text);
-  font-size: 18px;
-  line-height: 1;
-  color: var(--ink);
-  animation: blink 1s step-end infinite;
+  color: var(--ink-dim);
 }
-
+.bubble.done .vmark {
+  display: block;
+}
 .bubble.done .cursor {
   display: none;
 }
 
-.bubble.done .vmark {
-  display: block;
+/* error: Pokédex red box */
+.bubble-error {
+  background: var(--red-deep);
+  border-color: var(--red-dk);
+}
+.bubble-error .text {
+  color: #ffc9bd;
+}
+.bubble-error .tag {
+  color: var(--red-hi);
 }
 
+.cursor {
+  display: inline-block;
+  width: 10px;
+  height: 20px;
+  margin-left: 4px;
+  vertical-align: text-bottom;
+  background: var(--ink);
+  animation: blink 0.9s step-end infinite;
+}
 @keyframes blink {
   50% {
     opacity: 0;
   }
 }
 
-/* ---------------------------------------------------------------- *
- * Misc
- * ---------------------------------------------------------------- */
+/* ── a11y ───────────────────────────────────────────────────────── */
 
-.hints {
-  margin: 0;
-  font-family: var(--font-pixel);
-  font-size: 7px;
-  line-height: 2;
-  letter-spacing: 1px;
-  color: #565d6b;
-  text-align: center;
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
 }
 
+/* ── focus ──────────────────────────────────────────────────────── */
+
+button:focus-visible,
+input:focus-visible {
+  outline: 3px solid var(--red);
+  outline-offset: 3px;
+}
+.screen:focus-visible {
+  outline: 3px solid var(--red-hi);
+  outline-offset: 2px;
+}
+
+/* ── responsive ─────────────────────────────────────────────────── */
+
 @media (max-width: 520px) {
-  .console {
-    padding: 18px 16px 22px;
-    border-radius: 18px 18px 80px 18px;
+  body {
+    padding: 18px 8px;
   }
-
-  .brand-title {
-    font-size: 14px;
+  .device {
+    padding: 14px 16px 18px;
   }
-
-  .tagline,
-  .pokeball {
-    display: none;
+  .logo {
+    margin: 0 2px 10px;
   }
-
+  .logo-gb,
+  .logo-color {
+    font-size: 11px;
+  }
+  .seam {
+    margin: 10px 4px 12px;
+  }
   .dpad {
-    grid-template-columns: repeat(3, 20px);
-    grid-template-rows: repeat(3, 20px);
+    grid-template-columns: repeat(3, 22px);
+    grid-template-rows: repeat(3, 22px);
   }
-
-  .btn-a {
-    width: 48px;
-    height: 48px;
+  .nav-arm,
+  .nav-core {
+    width: 22px;
+    height: 22px;
   }
-
-  .pills {
-    gap: 16px;
+  .nav-core::after {
+    width: 8px;
+    height: 8px;
   }
-
-  .pill {
-    width: 52px;
+  .textbox {
+    height: 52px;
+    padding: 8px 14px;
+    font-size: 19px;
   }
-
+  .btn-a,
+  .btn-b {
+    width: 44px;
+    height: 42px;
+  }
+  .ab-col.col-b {
+    margin-top: 8px;
+  }
+  .ab-col.col-a {
+    margin-bottom: 8px;
+  }
+  .base-row {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+  }
+  .hints {
+    flex-basis: 100%;
+    text-align: center;
+    order: 3;
+  }
   .speaker {
     display: none;
   }
 }
 
+/* ── reduced motion ─────────────────────────────────────────────── */
+
 @media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
+  .cursor,
+  .vmark,
+  .led.busy {
+    animation: none;
+  }
+  .screen {
+    scroll-behavior: auto;
+  }
+  * {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
-    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
   }
 }

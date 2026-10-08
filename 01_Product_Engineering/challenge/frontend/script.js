@@ -1,4 +1,4 @@
-// PokéChat frontend.
+// PokéDex frontend — a Gen 1 Pokédex skin.
 //
 // Talks to the /chat endpoint through the Gradio client, still loaded from
 // the public CDN (same dependency as before): on a network that blocks the
@@ -26,8 +26,8 @@ const btnSelect = document.getElementById("btn-select");
 
 const history = []; // the whole memory of the conversation
 let busy = false; // a reply is streaming
-let soundOn = true; // START
-let autoScroll = true; // SELECT
+let soundOn = true; // SPEECH pill
+let autoScroll = true; // CHECK pill
 
 const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -142,10 +142,10 @@ async function typeInto(ref, text, cps = 40) {
 // --- The conversation ------------------------------------------------------
 
 async function welcome() {
-  const w = addBubble("ai", "AI");
+  const w = addBubble("ai", "DEX");
   await typeInto(
     w,
-    "Welcome, trainer!\nI'm PokéChat. Ask me anything,\nthen press A to send.",
+    "Poke-dex! I'm your Pokédex.\nAsk me anything, then press\nthe red button to send.",
   );
   finishTurn(w);
 }
@@ -165,7 +165,7 @@ form.addEventListener("submit", async (event) => {
 
   const user = addBubble("user", "YOU");
   user.body.textContent = message;
-  const ai = addBubble("ai", "AI");
+  const ai = addBubble("ai", "DEX");
 
   let reply = "";
   let lastTick = 0;
@@ -298,7 +298,7 @@ btnSelect.addEventListener("click", () => {
 // D-pad scrolls; paging by hand switches autoscroll off, like paging
 // through an old game's menu. (Right jumps to the end, which autoscroll
 // already does, so it stays on.)
-for (const btn of document.querySelectorAll("button.dpad-arm")) {
+for (const btn of document.querySelectorAll("button.nav-arm")) {
   btn.addEventListener("click", () => {
     const dir = btn.dataset.dir;
     const behavior = reducedMotion ? "auto" : "smooth";
