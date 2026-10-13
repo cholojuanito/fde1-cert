@@ -1,30 +1,13 @@
-import base64
-import binascii
+import gradio as gr
 
 from schemas.tax_document import K1Document
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field
 
-
-class UploadedFile(BaseModel):
-    """One file transported as JSON-safe base64 text."""
-
-    filename: str = Field(description="Original uploaded filename")
-    content_base64: str = Field(description="Base64-encoded file contents")
-    mime_type: str = Field(default="application/pdf", description="Uploaded file MIME type")
-
-    @field_validator("content_base64")
-    @classmethod
-    def validate_base64(cls, value: str) -> str:
-        try:
-            base64.b64decode(value, validate=True)
-        except (binascii.Error, ValueError) as exc:
-            raise ValueError("content_base64 must contain valid base64 data") from exc
-        return value
 
 class Request(BaseModel):
-    """Files submitted as JSON-safe base64 data."""
+    """Files submitted through the UI."""
 
-    files: list[UploadedFile] = Field(min_length=1, description="Uploaded tax documents")
+    files: list[gr.FileData] = Field(min_length=1, description="Uploaded tax documents")
 
 class Response(BaseModel):
     """
@@ -33,4 +16,7 @@ class Response(BaseModel):
     k1_document: K1Document
 
 def solve(req: Request) -> Response:
+    for f in req.files:
+        print(f"Name: {f.orig_name} {f.path}")
+        print(f"Filesize bytes {f.size}")
     raise NotImplementedError("not implemented yet")
