@@ -1,118 +1,29 @@
 <!doctype html>
 <html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>PokéDex</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link
-    href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap"
-    rel="stylesheet"
-  />
-  <link rel="stylesheet" href="/style.css" />
-  <script type="module" src="/script.js"></script>
-</head>
-<body>
-  <h1 class="sr-only">PokéDex chat</h1>
-  <noscript>
-    <p style="font-family: monospace; color: #e6ecff; text-align: center">
-      The Pokédex cannot power on without JavaScript.
-    </p>
-  </noscript>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Bifrost K-1 Reviewer</title>
+    <link rel="stylesheet" href="/style.css" />
+    <script type="module" src="/script.js"></script>
+  </head>
+  <body>
+    <main class="container">
+      <h1>Bifrost K-1 Reviewer</h1>
+      <p class="intro">Upload one or more tax documents to extract and review their data.</p>
 
-  <!-- Game Boy Color -->
-  <main class="device" aria-label="PokéDex chat on a Game Boy Color">
-    <!-- Faceplate logo -->
-    <div class="logo" aria-hidden="true">
-      <span class="logo-gb">GAME BOY</span
-      ><span class="logo-color"><i>C</i><i>O</i><i>L</i><i>O</i><i>R</i></span>
-    </div>
+      <form id="form">
+        <label for="files">Tax documents</label>
+        <input id="files" type="file" accept="application/pdf,.pdf" multiple required />
+        <p id="selection" class="selection">No files selected.</p>
+        <button id="submit" type="submit">Process documents</button>
+      </form>
 
-    <!-- Screen: battery light + header bar + scrolling log -->
-    <div class="bezel">
-      <div class="bezel-top">
-        <span id="led" class="led" aria-hidden="true"></span>
-        <span class="status-label">BATTERY</span>
-      </div>
-      <header class="screen-head">
-        <span class="ball-icon" aria-hidden="true"></span>
-        <span class="screen-title">POKÉDEX</span>
-        <span id="model-badge" class="screen-badge"></span>
-      </header>
-      <div id="log" class="screen" role="log" aria-live="polite" tabindex="0"></div>
-    </div>
-
-    <!-- Body seam -->
-    <div class="seam" aria-hidden="true"></div>
-
-    <form id="form">
-      <!-- Text entry -->
-      <div class="input-row">
-        <input
-          id="input"
-          class="textbox"
-          type="text"
-          maxlength="2000"
-          autocomplete="off"
-          placeholder="ASK THE POKÉDEX…"
-        />
-      </div>
-
-      <!-- Cursor pad + A / B keys -->
-      <div class="deck">
-        <div class="dpad" role="group" aria-label="Scroll log">
-          <button type="button" class="nav-arm u" data-dir="up" aria-label="Page up">▲</button>
-          <button type="button" class="nav-arm l" data-dir="left" aria-label="Jump to start">◀</button>
-          <span class="nav-core" aria-hidden="true"></span>
-          <button type="button" class="nav-arm r" data-dir="right" aria-label="Jump to end">▶</button>
-          <button type="button" class="nav-arm d" data-dir="down" aria-label="Page down">▼</button>
-        </div>
-        <div class="ab">
-          <span class="ab-col col-b">
-            <span class="ab-label">B</span>
-            <button id="btn-b" class="btn-b" type="button" aria-label="Clear log"></button>
-          </span>
-          <span class="ab-col col-a">
-            <span class="ab-label">A</span>
-            <button id="btn-a" class="btn-a" type="submit" aria-label="Send message"></button>
-          </span>
-        </div>
-      </div>
-    </form>
-
-    <!-- Base row: hints + START / SELECT + speaker -->
-    <div class="base-row">
-      <p class="hints">
-        A SEND · B CLEAR<br />
-        SPEECH SOUND · CHECK SCROLL
-      </p>
-      <div class="pills">
-        <span class="pill-wrap wrap-start">
-          <button
-            id="btn-start"
-            class="pill"
-            type="button"
-            aria-pressed="true"
-            aria-label="Toggle sound"
-          ></button>
-          <span class="pill-label">SPEECH</span>
-        </span>
-        <span class="pill-wrap wrap-select">
-          <button
-            id="btn-select"
-            class="pill"
-            type="button"
-            aria-pressed="true"
-            aria-label="Toggle autoscroll"
-          ></button>
-          <span class="pill-label">CHECK</span>
-        </span>
-      </div>
-      <div class="speaker" aria-hidden="true">
-        <i></i><i></i><i></i><i></i><i></i><i></i>
-      </div>
-    </div>
-  </main>
-</body>
+      <section aria-labelledby="results-heading">
+        <h2 id="results-heading">Results</h2>
+        <div id="status" role="status"></div>
+        <pre id="results">Results will appear here.</pre>
+      </section>
+    </main>
+  </body>
 </html>
