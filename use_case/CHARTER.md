@@ -6,9 +6,9 @@
   template. That is on purpose.
 -->
 
-**Department:** <!-- your answer here -->
+**Department:** Finance
 
-**Working title:** <!-- your answer here -->
+**Working title:** Bifrost
 
 ---
 
@@ -16,23 +16,23 @@
 
 **Who has it?** One real role, not a department.
 
-<!-- your answer here -->
+Financial advisors
 
 **What are they trying to do?**
 
-<!-- your answer here -->
+Quickly convert K-1 tax documents (PDFs) to accurate data in their core tax software
 
 **How do they handle it today?**
 
-<!-- your answer here -->
+Manually reviewing outputs from paid software that doesn't perform well on state and local (SALT) K-1 documents
 
 **What does that cost — time, money, risk, or relationships?**
 
-<!-- your answer here -->
+Hours of financial advisor time spent on manual data entry and multi-person reviews instead of tax strategy or scaling their customer base
 
 **The problem in one sentence. No solution in it.**
 
-<!-- your answer here -->
+Thousands of hours of financial advisor time and money is spent on manual data entry then multi-person review of tax documents
 
 ---
 
@@ -40,11 +40,11 @@
 
 **What does the new world look like for that person?**
 
-<!-- your answer here -->
+Provide the K-1, have all the data entered into their core tax software, ready to be finalized.
 
 **How would the firm measure it? Which numbers should move?**
 
-<!-- your answer here -->
+Hours spent on data entry/review
 
 ---
 
@@ -52,16 +52,64 @@
 
 **Your solution in one sentence.**
 
-<!-- your answer here -->
+A tax copilot for financial advisors that processes K-1 documents, extracts accurate, verified information and integrates with CCH Axcess, helping the firm reduce 1,000's of manual data entry hours annually and reduce audit risk.
 
 **Input → Output.** Be specific enough that someone could build it wrong and you
 would notice.
 
 | | |
 | --- | --- |
-| **In** | <!-- your answer here --> |
-| **Out** | <!-- your answer here --> |
+| **In** | Raw Schedule K-1 PDF files |
+| **Out** | There will be quite a few pieces of output. See below. |
+### Outputs
+1. Tax form data mostly for SALT files i.e. for [UTAH 2024](https://files.tax.utah.gov/tax/forms/2024/tc-65-k1.pdf) or [UTAH 2025](https://files.tax.utah.gov/tax/forms/current/tc-65.pdf). all of which should be easily exportable to an excel file. Includes:
+  - tax year
+  - state/jurisdiction
+  - partnership info -- info about the corporation
+    - employer identification number (EIN)
+    - name
+    - address
+  - partner info -- info about an individual human in the partnership
+    - name
+    - address
+    - social security number (SSN) or EIN
+    - phone number
+    - percent of ownership
+    - limited partner? (yes/no)
+    - entity code - enum of options
+    - date of affliation
+    - date of withdrawal
+  - apportionment factors -- divvy up company assets for tax accuracy
+    - property
+    - payroll
+    - sales
+  - income, deductions, credits, losses -- lots of fields involved here, refer to PDF above or json schema I will create
+2. document metadata
+  - file info -- general file related info
+    - doc id/filename
+    - file hashes (sha256 or md5)
+    - mime type
+    - file size
+  - document structure -- any info about the documents or sub documents in a single PDF
+    - number of pages
+    - forms detected i.e TC65 vs TC20 and the various schedules in the document
+    - states/jurisdiction i.e. federal vs UT vs CA
+    - applicable tax years
+  - processing info -- info about the processing pipeline
+    - timestamp
+    - duration
+    - processing pipeline version
+    - model id/name
+    - ocr engine used
+---
 
+### **Output Excel Filename Patterns**
+| | |
+| --- | --- |
+| Template | Purpose |
+| K1yyyyP.xls | Partnership K-1 data |
+| K1yyyyS.xls | S Corporation K-1 data |
+| K1yyyyF.xls	| Fiduciary K-1 data |
 ---
 
 ## Decisions made later
