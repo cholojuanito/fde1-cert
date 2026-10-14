@@ -39,7 +39,7 @@ def health() -> dict:
     return {"status": "ok", "model": os.getenv("LLM_MODEL", "gpt-4.1-mini")}
 
 
-demo = build_demo(extract=extract_document_info)
+demo = build_demo(extract=extract_document_info, chat=chat)
 # The root mount handles Gradio requests before the API engine created by
 # Server.launch, so expose the same functions in the mounted Blocks app.
 with demo:

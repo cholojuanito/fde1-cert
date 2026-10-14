@@ -1,4 +1,4 @@
-from collections.abc import Callable
+from collections.abc import Callable, Iterator
 from pathlib import Path
 
 import gradio as gr
@@ -7,7 +7,8 @@ from schema import Request, Response
 
 
 def build_demo(
-    extract: Callable[[Request], Response]
+    extract: Callable[[Request], Response],
+    chat: Callable[[str, list], Iterator[str]],
 ) -> gr.Blocks:
     def process_files(paths: list[str] | None) -> dict:
         if not paths:
@@ -25,15 +26,37 @@ def build_demo(
         )
         return extract(request).model_dump(mode="json")
 
-    with gr.Blocks(title="Bifrost K-1 Reviewer") as demo:
-        files = gr.File(type="filepath", file_count="multiple", file_types=[".pdf"])
-        output = gr.JSON(label="Extraction Result")
+    def chat_with_history(message: str, history: list) -> Iterator[str]:
+        # Gradio 6 can represent message content as text blocks; the existing
+        # model wrapper expects ordinary strings for this text-only interface.
+        messages = []
+        for turn in history:
+            content = turn["content"]
+            if isinstance(content, list):
+                content = "\n".join(
+                    block["text"] for block in content if block.get("type") == "text"
+                )
+            messages.append({"role": turn["role"], "content": content})
+        yield from chat(message, messages)
 
-        gr.Button("Upload").click(
-            fn=process_files,
-            inputs=files,
-            outputs=output,
-            api_name=False,
-            queue=False,
-        )
+    with gr.Blocks(title="Bifrost K-1 Reviewer") as demo:
+        with gr.Tab("K-1 Documents"):
+            files = gr.File(type="filepath", file_count="multiple", file_types=[".pdf"])
+            output = gr.JSON(label="Extraction Result")
+
+            gr.Button("Upload").click(
+                fn=process_files,
+                inputs=files,
+                outputs=output,
+                api_name=False,
+                queue=False,
+            )
+        with gr.Tab("Chat"):
+            gr.ChatInterface(
+                fn=chat_with_history,
+                description="Use text prompts for the Step 11 general-capability checks.",
+                api_name="chat_ui",
+                api_visibility="private",
+                autofocus=False,
+            )
     return demo
