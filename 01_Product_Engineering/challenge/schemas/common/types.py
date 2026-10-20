@@ -1,6 +1,6 @@
 from decimal import Decimal
-from pydantic import StringConstraints, Field
-from typing import Annotated
+from pydantic import StringConstraints, Field, BaseModel
+from typing import Annotated, Literal
 
 EIN = Annotated[
     str,
@@ -24,4 +24,38 @@ USPhone = Annotated[
 Percentage = Annotated[
     Decimal,
     Field(ge=0, le=100),
+]
+
+class MoneyValue(BaseModel):
+    kind: Literal["money"] = "money"
+    amount: Decimal
+
+
+class TextValue(BaseModel):
+    kind: Literal["text"] = "text"
+    text: str
+
+
+class PercentageValue(BaseModel):
+    kind: Literal["percentage"] = "percentage"
+    value: Percentage
+
+
+class BooleanValue(BaseModel):
+    kind: Literal["boolean"] = "boolean"
+    value: bool
+
+
+class CountValue(BaseModel):
+    kind: Literal["count"] = "count"
+    value: int
+
+
+FieldValue = Annotated[
+    MoneyValue
+    | TextValue
+    | PercentageValue
+    | BooleanValue
+    | CountValue,
+    Field(discriminator="kind"),
 ]

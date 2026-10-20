@@ -1,6 +1,9 @@
 import gradio as gr
 
-from schemas.tax_document import K1Document
+from schemas.domain.tax_document import TaxDocument
+from schemas.extraction.extraction import SourceDocument
+from schemas.common.enum import Parser
+from extraction.parse import parse_document
 from pydantic import BaseModel, Field
 
 
@@ -13,10 +16,17 @@ class Response(BaseModel):
     """
     Extracted outputs from agentic/model document processing
     """
-    k1_document: K1Document
+    documents: list[TaxDocument] = Field(
+        default_factory=list
+    )
+    source_documents: list[SourceDocument] = Field(
+        default_factory=list
+    )
 
 def solve(req: Request) -> Response:
-    for f in req.files:
-        print(f"Name: {f.orig_name} {f.path}")
-        print(f"Filesize bytes {f.size}")
-    raise NotImplementedError("not implemented yet")
+    # Parse/extraction info from docs
+    parsed_docs = parse_document(Parser.DOCLING, req.files)
+    print(parsed_docs)
+    # Convert to common format
+    # Let agent look over extraction, match form definition, audit, investigate, correct, reaudit
+    return Response(documents=[])

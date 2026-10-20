@@ -1,9 +1,8 @@
-from typing import Annotated
 from datetime import date
 from decimal import Decimal
 from .address import Address
 from .types import EIN, TaxPayerID, USPhone
-from .enum import EntityCode
+from .enum import PartnershipType
 from pydantic import BaseModel, Field
 
 class Partnership(BaseModel):
@@ -26,7 +25,7 @@ class Partner(BaseModel):
         le=100,
     )
     limited_partner: bool = Field(description="Is limited partner?")
-    entity_code: EntityCode = Field(description="The type of partnership")
+    entity_code: PartnershipType = Field(description="The type of partnership")
     date_of_affiliation: date = Field(description="Date partner began to be involved in partnership")
     date_of_withdrawl: date | None = Field(
         description="Date partner left the partnership",
