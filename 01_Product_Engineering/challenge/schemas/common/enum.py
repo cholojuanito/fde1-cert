@@ -46,6 +46,12 @@ class ReviewStatus(StrEnum):
     NEEDS_REVIEW = "needs_review"
     REJECTED = "rejected"
 
+class ObservationStatus(StrEnum):
+    OBSERVED = "observed"
+    BLANK = "blank"
+    UNREADABLE = "unreadable"
+    NOT_FOUND = "not_found"
+
 class State(StrEnum):
     UTAH = 'UT'
     DELAWARE = 'DE'

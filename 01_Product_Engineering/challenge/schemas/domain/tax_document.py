@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field
 
-from ..common.enum import TaxDocumentType, ReviewStatus
+from ..common.enum import TaxDocumentType, ReviewStatus, ObservationStatus
 from ..common.types import FieldValue
 from ..extraction.extraction import SourceLocation
 
@@ -14,6 +14,7 @@ class TaxEvidence(BaseModel):
 class TaxFormField(BaseModel):
     """An extracted tax field"""
     field_id: str
+    observation_status: ObservationStatus
     value: FieldValue | None = Field(description="Form field value", default=None)
     description: str | None = Field(description="Form field description", default=None)
     code: str | None = Field(description="Form field code, if applicable", default=None)
