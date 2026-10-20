@@ -22,7 +22,7 @@ class FindingSeverity(StrEnum):
 
 
 class AuditFinding(BaseModel):
-    form_id: str
+    document_id: str | None = None
     field_id: str | None = None
     finding_type: FindingType
     severity: FindingSeverity
@@ -33,6 +33,7 @@ class AuditFinding(BaseModel):
 
 
 class AuditResult(BaseModel):
+    document_id: str
     form_id: str
     findings: list[AuditFinding] = Field(
         default_factory=list
