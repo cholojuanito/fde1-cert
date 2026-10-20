@@ -50,7 +50,7 @@ class SourceDocument(BaseModel):
     id: str
     filename: str
     sha256: str
-    page_count: int
+    page_count: int = Field(ge=0)
     storage_uri: str
 
 class ExtractedPage(BaseModel):
@@ -67,10 +67,10 @@ class ExtractionArtifact(BaseModel):
     source_document: SourceDocument
     parser: Parser
     parser_version: str
-    config_hash: str
+    config: dict
     status: ExtractionArtifactStatus
     format: ExtractionArtifactFormat
     created_at: datetime
-    output_uri: str | None # Full parser output
+    output_uri: str | None = None # Full parser output
     pages: list[ExtractedPage] = Field(default_factory=list)
     warnings: list[str] = Field(default_factory=list)
