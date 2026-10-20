@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from ..common.enum import TaxDocumentType, ReviewStatus, ObservationStatus
 from ..common.types import FieldValue
@@ -21,6 +21,36 @@ class TaxFormField(BaseModel):
     qualifiers: dict[str, str] = Field(default_factory=dict)
     evidence: list[TaxEvidence] = Field(default_factory=list)
     status: ReviewStatus = ReviewStatus.EXTRACTED
+
+
+class FieldExtractionDraft(BaseModel):
+    """Untrusted model proposal; evidence references are checked by the caller."""
+    model_config = ConfigDict(extra="forbid")
+
+    field_id: str
+    observation_status: ObservationStatus
+    value: FieldValue | None = None
+    description: str | None = None
+    code: str | None = None
+    evidence_element_ids: list[str] = Field(default_factory=list)
+    evidence_text: str | None = None
+
+    @model_validator(mode="after")
+    def value_only_when_observed(self):
+        if self.observation_status == ObservationStatus.OBSERVED and self.value is None:
+            raise ValueError("Observed fields must include a typed value")
+        if self.observation_status != ObservationStatus.OBSERVED and self.value is not None:
+            raise ValueError("Only observed fields may include a typed value")
+        return self
+
+
+class TaxExtractionDraft(BaseModel):
+    """Structured, untrusted response from the extraction model."""
+    model_config = ConfigDict(extra="forbid")
+
+    form_id: str
+    tax_year: int
+    fields: list[FieldExtractionDraft]
 
 class TaxDocument(BaseModel):
     """A tax form within a larger tax bundle or source document"""
