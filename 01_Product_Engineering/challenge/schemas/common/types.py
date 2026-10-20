@@ -1,15 +1,22 @@
 from decimal import Decimal
-from pydantic import StringConstraints, Field, BaseModel
+from pydantic import StringConstraints, Field, BaseModel, WithJsonSchema
 from typing import Annotated, Literal
+
+DECIMAL_PATTERN = r"^[+-]?[0-9]*\.?[0-9]+$"
+SchemaDecimal = Annotated[
+    Decimal,
+    WithJsonSchema({"type": "number", "pattern": DECIMAL_PATTERN}),
+]
+
 
 EIN = Annotated[
     str,
-    StringConstraints(pattern=r"^\d{2}-\d{7}$"),
+    StringConstraints(pattern=r"^[0-9]{2}-[0-9]{7}$"),
 ]
 
 SSN = Annotated[
     str,
-    StringConstraints(pattern=r"^\d{3}-\d{2}-\d{4}$"),
+    StringConstraints(pattern=r"^[0-9]{3}-[0-9]{2}-[0-9]{4}$"),
 ]
 TaxPayerID = EIN | SSN
 
@@ -17,18 +24,18 @@ TaxPayerID = EIN | SSN
 USPhone = Annotated[
     str,
     StringConstraints(
-        pattern=r"^(?:\+1[\s.-]?)?(?:\(\d{3}\)|\d{3})[\s.-]?\d{3}[\s.-]?\d{4}$"
+        pattern=r"^(?:\+1[\s.-]?)?(?:\([0-9]{3}\)|[0-9]{3})[\s.-]?[0-9]{3}[\s.-]?[0-9]{4}$"
     ),
 ]
 
 Percentage = Annotated[
-    Decimal,
+    SchemaDecimal,
     Field(ge=0, le=100),
 ]
 
 class MoneyValue(BaseModel):
     kind: Literal["money"] = "money"
-    amount: Decimal
+    amount: SchemaDecimal
 
 
 class TextValue(BaseModel):
