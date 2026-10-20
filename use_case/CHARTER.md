@@ -40,7 +40,7 @@ Thousands of hours of financial advisor time and money is spent on manual data e
 
 **What does the new world look like for that person?**
 
-Provide the K-1, have all the data entered into their core tax software, ready to be finalized.
+Provide the K-1, have all the data entered into their core tax software (or a format that their software can bulk import), ready to be finalized.
 
 **How would the firm measure it? Which numbers should move?**
 
@@ -59,10 +59,10 @@ would notice.
 
 | | |
 | --- | --- |
-| **In** | Raw Schedule K-1 PDF files |
+| **In** | Raw Tax PDF files |
 | **Out** | There will be quite a few pieces of output. See below. |
 ### Outputs
-1. Tax form data mostly for SALT files i.e. for [UTAH 2024](https://files.tax.utah.gov/tax/forms/2024/tc-65-k1.pdf) or [UTAH 2025](https://files.tax.utah.gov/tax/forms/current/tc-65.pdf). all of which should be easily exportable to an excel file. Includes:
+1. Tax form data for companies and partnerships including federal Schedule K-1s, state and local K-1 equivalent files i.e. for [UTAH 2024](https://files.tax.utah.gov/tax/forms/2024/tc-65-k1.pdf) or [UTAH 2025](https://files.tax.utah.gov/tax/forms/current/tc-65.pdf), and any attached statements or other schedules that those files point to i.e. 199A, foreign incomes, or other custom "statements". All of which should be easily exportable to an excel file. Includes but these will be defined in a more declarative way so that I can support all the possible tax documents and form fields without making L X M X N models for all the documents (L=tax form, M=tax year, N=state/jurisdiction)
   - tax year
   - state/jurisdiction
   - partnership info -- info about the corporation
@@ -122,6 +122,7 @@ would notice.
 
 | Week | Decision | Why, and what you rejected |
 | --- | --- | --- |
+| 1 | Charter Inputs and Outputs | After so more talks with the stakeholders it became apparent that this would be an extract and review task instead of just review. I have no access to the extracted outputs from their existing K-1x software and it would be difficult to get access. Pluswe think this blends better with the agentic approach this course asks for. |
 | 3 | Retrieval approach | <!-- TC3 --> |
 | 5 | Agent architecture | <!-- TC5 --> |
 | 8 | Model | <!-- TC8 --> |
