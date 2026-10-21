@@ -20,6 +20,7 @@ RUN uv export --frozen --no-dev --no-emit-project -o requirements.txt \
  && uv pip install --system --no-cache -r requirements.txt
 
 COPY llm.py app.py ui.py schema.py ./
+COPY extraction/ ./extraction/
 COPY schemas/ ./schemas/
 COPY frontend/ ./frontend/
 
