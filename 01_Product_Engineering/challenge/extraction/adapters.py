@@ -28,7 +28,7 @@ from schemas.extraction.extraction import (
 
 
 PARSER_CONFIG = {
-    Parser.DOCLING: {"do_ocr": False, "do_table_structure": True},
+    Parser.DOCLING: {"do_ocr": True, "ocr_mode": "full_page", "do_table_structure": True},
     Parser.LITEPARSE: {"ocr_enabled": False, "extract_blocks": True},
 }
 

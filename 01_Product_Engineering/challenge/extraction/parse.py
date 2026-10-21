@@ -13,11 +13,12 @@ class ParsedFile:
 
 def _parse_with_docling(files: list[FileData]) -> list[ParsedFile]:
     from docling.datamodel.base_models import InputFormat
-    from docling.datamodel.pipeline_options import PdfPipelineOptions, TableStructureOptions
+    from docling.datamodel.pipeline_options import OcrMode, PdfPipelineOptions, TableStructureOptions
     from docling.document_converter import DocumentConverter, PdfFormatOption
 
     pipeline_options = PdfPipelineOptions()
-    pipeline_options.do_ocr = False
+    pipeline_options.do_ocr = True
+    pipeline_options.ocr_options.mode = OcrMode.FULL_PAGE
     pipeline_options.do_table_structure = True
     pipeline_options.table_structure_options = TableStructureOptions(do_cell_matching=True)
     converter = DocumentConverter(
