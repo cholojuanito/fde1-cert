@@ -10,21 +10,21 @@ def build_demo(
     extract: Callable[[Request], Response],
     chat: Callable[[str, list], Iterator[str]],
 ) -> gr.Blocks:
-    def process_files(paths: list[str] | None) -> dict:
-        if not paths:
-            raise gr.Error("Please upload at least one PDF")
+    def process_file(path: str | None) -> dict:
+        if not path:
+            raise gr.Error("Please upload one PDF")
         request = Request(
-            files=[
-                gr.FileData(
-                    path=path,
-                    orig_name=getattr(path, "orig_name", Path(path).name),
-                    mime_type="application/pdf",
-                    size=Path(path).stat().st_size,
-                )
-                for path in paths
-            ]
+            files=[gr.FileData(
+                path=path,
+                orig_name=Path(path).name,
+                mime_type="application/pdf",
+                size=Path(path).stat().st_size,
+            )]
         )
-        return extract(request).model_dump(mode="json")
+        try:
+            return extract(request).model_dump(mode="json")
+        except ValueError as exc:
+            raise gr.Error(str(exc)) from exc
 
     def chat_with_history(message: str, history: list) -> Iterator[str]:
         # Gradio 6 can represent message content as text blocks; the existing
@@ -41,11 +41,11 @@ def build_demo(
 
     with gr.Blocks(title="Bifrost K-1 Reviewer") as demo:
         with gr.Tab("K-1 Documents"):
-            files = gr.File(type="filepath", file_count="multiple", file_types=[".pdf"])
+            files = gr.File(type="filepath", file_count="single", file_types=[".pdf"])
             output = gr.JSON(label="Extraction Result")
 
             gr.Button("Upload").click(
-                fn=process_files,
+                fn=process_file,
                 inputs=files,
                 outputs=output,
                 api_name=False,

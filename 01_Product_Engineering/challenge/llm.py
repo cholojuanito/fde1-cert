@@ -60,17 +60,26 @@ def stream_reply(message: str, history: list[dict] | None = None):
 
 
 def extract_tax_fields(
-    artifact: ExtractionArtifact, definition: FormDefinition
+    artifact: ExtractionArtifact,
+    definition: FormDefinition,
+    page_numbers: list[int] | None = None,
 ) -> TaxExtractionDraft:
     """Make one structured model call to map parser evidence to defined fields."""
     elements = [
         {
             "id": element.id,
-            "page": element.locations[0].page,
             "text": element.text,
             "label": element.extractor_label,
+            "locations": [
+                {
+                    "page": location.page,
+                    "bbox": location.bbox.model_dump(mode="json") if location.bbox else None,
+                }
+                for location in element.locations
+            ],
         }
         for page in artifact.pages
+        if page_numbers is None or page.page_number in page_numbers
         for element in page.elements
         if element.text
     ]
@@ -80,18 +89,19 @@ def extract_tax_fields(
         "rules": [
             "Only return field IDs present in the supplied definition.",
             "Return one outcome for every defined field.",
-            "Use blank when the field is visibly blank, unreadable when present but illegible, and not_found when no supporting region is located.",
+            "Use not_found when no value evidence is extracted. Do not call a field blank just because its value is absent from text.",
+            "Use unreadable only when the supplied evidence shows a present but illegible value; such results require human review.",
             "Never infer or calculate a value. Preserve negative signs and decimal values.",
             "For each outcome, cite evidence_element_ids from the supplied elements.",
-            "Money values use kind=money; percentages use kind=percentage; other values use kind=text.",
+            "Use the exact value kind from the field definition (money, text, percentage, boolean, count, or date).",
         ],
         "definition": definition.model_dump(mode="json"),
         "document": {
             "filename": artifact.source_document.filename,
+            "page_numbers": page_numbers,
             "elements": elements,
         },
     }
-    print(f"PROMPT: {json.dumps(prompt, ensure_ascii=False)}")
     kwargs = {
         "model": MODEL,
         "messages": [
