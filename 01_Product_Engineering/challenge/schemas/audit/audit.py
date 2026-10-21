@@ -35,6 +35,8 @@ class AuditFinding(BaseModel):
 class AuditResult(BaseModel):
     document_id: str
     form_id: str
+    form_revision: str | None = None
+    tax_year: int | None = None
     findings: list[AuditFinding] = Field(
         default_factory=list
     )
