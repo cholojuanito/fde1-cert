@@ -59,6 +59,7 @@ class TaxDocument(BaseModel):
     document_type: TaxDocumentType
     jurisdiction: str
     form_id: str | None = None
+    form_revision: str | None = None
     tax_year: int | None = None
     page_numbers: list[int] = Field(default_factory=list)
     issuing_entity_id: str | None = None

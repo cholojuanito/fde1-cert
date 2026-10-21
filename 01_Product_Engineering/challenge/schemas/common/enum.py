@@ -52,6 +52,11 @@ class ObservationStatus(StrEnum):
     UNREADABLE = "unreadable"
     NOT_FOUND = "not_found"
 
+class TaxReturnType(StrEnum):
+    UTAH_TC65 = "TC-65"
+    UTAH_TC20 = "TC-20"
+    UTAH_TC20S = "TC-20S"
+
 class State(StrEnum):
     UTAH = 'UT'
     DELAWARE = 'DE'
