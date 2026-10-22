@@ -1,3 +1,5 @@
+import logging
+from collections import Counter
 from uuid import uuid4
 
 import gradio as gr
@@ -25,6 +27,7 @@ from schemas.domain.forms.factory import (
 from schemas.domain.tax_document import TaxDocument, TaxEvidence, TaxFormField
 from schemas.extraction.extraction import ExtractionArtifact
 
+logger = logging.getLogger(__name__)
 
 class Request(BaseModel):
     """Files submitted through the UI."""
@@ -48,7 +51,16 @@ def solve(req: Request) -> Response:
         raise ValueError("This MVP accepts one PDF at a time")
 
     artifact = adapter_for(Parser.DOCLING).adapt(parsed_files[0])
+    logger.info(
+        "Parsed %s with %s: %d pages, %d elements, %d warnings",
+        artifact.source_document.filename,
+        artifact.parser.value,
+        len(artifact.pages),
+        sum(len(page.elements) for page in artifact.pages),
+        len(artifact.warnings),
+    )
     identity = identify_artifact_form(artifact)
+    logger.info("Identified %s %s on pages %s", identity.return_type.value, identity.tax_year, identity.page_numbers)
     definition = create_form_definition(identity)
     page_numbers = identity.page_numbers
     if not page_numbers:
@@ -56,6 +68,7 @@ def solve(req: Request) -> Response:
     require_readable_fields(artifact, definition, page_numbers)
 
     draft = extract_tax_fields(artifact, definition, page_numbers)
+    logger.info("Model draft outcomes: %s", dict(Counter(field.observation_status.value for field in draft.fields)))
     if draft.form_id != definition.form_id or draft.tax_year != definition.tax_year:
         raise ValueError("The model's form identification does not match the selected definition")
 
@@ -133,6 +146,18 @@ def solve(req: Request) -> Response:
                 message="Evidence must refer to elements on the selected K-1 page.",
             ))
 
+    no_observed_values = bool(candidates) and not any(
+        field.observation_status == ObservationStatus.OBSERVED
+        for field in candidates.values()
+    )
+    if no_observed_values:
+        findings.append(AuditFinding(
+            document_id=document_id,
+            finding_type=FindingType.OTHER,
+            severity=FindingSeverity.WARNING,
+            message="The model did not identify any observed values; review the extraction draft and prompt evidence.",
+        ))
+
     tax_fields = []
     for field_definition in definition.fields:
         candidate = candidates.get(field_definition.id)
@@ -154,6 +179,7 @@ def solve(req: Request) -> Response:
         evidence = [
             TaxEvidence(
                 artifact_id=artifact.id,
+                reason=candidate.reason,
                 element_id=element.id,
                 locations=element.locations,
                 text=element.text,
@@ -165,12 +191,14 @@ def solve(req: Request) -> Response:
             finding.field_id == candidate.field_id
             and finding.severity == FindingSeverity.ERROR
             for finding in findings
-        ) or candidate.observation_status in {ObservationStatus.BLANK, ObservationStatus.UNREADABLE}
+        ) or candidate.observation_status in {ObservationStatus.BLANK, ObservationStatus.UNREADABLE} or (
+            no_observed_values and candidate.observation_status == ObservationStatus.NOT_FOUND
+        )
         tax_fields.append(TaxFormField(
             field_id=candidate.field_id,
             observation_status=candidate.observation_status,
             value=candidate.value,
-            description=candidate.description,
+            description=field_definition.source.labels[0],
             code=candidate.code,
             evidence=evidence,
             status=ReviewStatus.NEEDS_REVIEW if invalid else ReviewStatus.EXTRACTED,
@@ -195,6 +223,7 @@ def solve(req: Request) -> Response:
         findings=findings,
         export_ready=False,
     )
+    logger.info("Final document outcomes: %s", dict(Counter(field.status.value for field in tax_fields)))
     return Response(
         document=document,
         extraction_artifact=artifact,

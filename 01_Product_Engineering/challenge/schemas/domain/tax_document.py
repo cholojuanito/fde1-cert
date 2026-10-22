@@ -8,8 +8,9 @@ class TaxEvidence(BaseModel):
     """Source evidence supporting an extracted tax value."""
     artifact_id: str
     element_id: str | None = None
+    reason: str = Field(description="Agent reasoning for evidence")
     locations: list[SourceLocation] = Field(default_factory=list)
-    text: str | None = None
+    text: str | None = Field(description="Text from document")
 
 class TaxFormField(BaseModel):
     """An extracted tax field"""
@@ -30,7 +31,8 @@ class FieldExtractionDraft(BaseModel):
     field_id: str
     observation_status: ObservationStatus
     value: FieldValue | None = None
-    description: str | None = None
+    reason: str = Field(description="Cited reason the evidence supports this extraction")
+    description: str | None = Field(description="Form field description", default=None)
     code: str | None = None
     evidence_element_ids: list[str] = Field(default_factory=list)
     evidence_text: str | None = None

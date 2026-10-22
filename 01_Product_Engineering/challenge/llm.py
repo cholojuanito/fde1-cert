@@ -10,6 +10,7 @@ That property matters more than it looks like it does right now -- see the
 
 import json
 import os
+from collections.abc import Callable
 
 from litellm import completion
 from pydantic import BaseModel
@@ -59,32 +60,81 @@ def stream_reply(message: str, history: list[dict] | None = None):
             yield reply
 
 
-def extract_tax_fields(
+def _artifact_prompt_text(
+    artifact: ExtractionArtifact,
+    page_numbers: list[int] | None,
+) -> str:
+    """Render parser elements as concise, citeable evidence lines for the model."""
+    lines = []
+    for page in artifact.pages:
+        if page_numbers is not None and page.page_number not in page_numbers:
+            continue
+        for element in page.elements:
+            if not element.text:
+                continue
+            lines.append(_evidence_line(element))
+    return "\n".join(lines)
+
+
+def _evidence_line(element) -> str:
+    text = " ".join(element.text.split())
+    locations = []
+    for location in element.locations:
+        if location.bbox:
+            bbox = location.bbox
+            locations.append(
+                f"p{location.page} ({bbox.x0:.0f},{bbox.y0:.0f})-"
+                f"({bbox.x1:.0f},{bbox.y1:.0f})"
+            )
+        else:
+            locations.append(f"p{location.page}")
+    label = f" {element.extractor_label}" if element.extractor_label else ""
+    return f"[{element.id}] {'; '.join(locations)}{label} | {text}"
+
+
+def _field_hints(
     artifact: ExtractionArtifact,
     definition: FormDefinition,
-    page_numbers: list[int] | None = None,
-) -> TaxExtractionDraft:
-    """Make one structured model call to map parser evidence to defined fields."""
+    page_numbers: list[int] | None,
+) -> list[dict]:
+    """Focus the model on each mapped label and the next local evidence lines."""
     elements = [
-        {
-            "id": element.id,
-            "text": element.text,
-            "label": element.extractor_label,
-            "locations": [
-                {
-                    "page": location.page,
-                    "bbox": location.bbox.model_dump(mode="json") if location.bbox else None,
-                }
-                for location in element.locations
-            ],
-        }
+        element
         for page in artifact.pages
         if page_numbers is None or page.page_number in page_numbers
         for element in page.elements
         if element.text
     ]
-    response_format: type[BaseModel] = TaxExtractionDraft
-    prompt = {
+    hints = []
+    for field in definition.fields:
+        labels = [" ".join(label.casefold().split()) for label in field.source.labels]
+        matches = [
+            index
+            for index, element in enumerate(elements)
+            if any(label in " ".join(element.text.casefold().split()) for label in labels)
+        ]
+        if not matches:
+            continue
+        evidence = []
+        for index in matches:
+            page = elements[index].locations[0].page
+            for candidate in elements[index:index + 4]:
+                if candidate.locations[0].page != page:
+                    break
+                line = _evidence_line(candidate)
+                if line not in evidence:
+                    evidence.append(line)
+        hints.append({"field_id": field.id, "nearby_evidence": evidence})
+    return hints
+
+
+def build_extraction_prompt(
+    artifact: ExtractionArtifact,
+    definition: FormDefinition,
+    page_numbers: list[int] | None = None,
+) -> dict:
+    """Build the structured-extraction prompt shared by production and inspection."""
+    return {
         "task": "Extract the listed fields from this tax form.",
         "rules": [
             "Only return field IDs present in the supplied definition.",
@@ -92,22 +142,42 @@ def extract_tax_fields(
             "Use not_found when no value evidence is extracted. Do not call a field blank just because its value is absent from text.",
             "Use unreadable only when the supplied evidence shows a present but illegible value; such results require human review.",
             "Never infer or calculate a value. Preserve negative signs and decimal values.",
-            "For each outcome, cite evidence_element_ids from the supplied elements.",
+            "For each outcome, cite evidence_element_ids using the ID in square brackets on an evidence line.",
+            "Coordinates use a top-left origin: x increases rightward and y increases downward. Use nearby labels and values together.",
+            "field_hints group each mapped label with its next evidence lines in reading order. If a hint contains a plausible adjacent value, return it as observed rather than not_found.",
             "Use the exact value kind from the field definition (money, text, percentage, boolean, count, or date).",
         ],
         "definition": definition.model_dump(mode="json"),
         "document": {
             "filename": artifact.source_document.filename,
             "page_numbers": page_numbers,
-            "elements": elements,
+            "field_hints": _field_hints(artifact, definition, page_numbers),
+            "evidence": _artifact_prompt_text(artifact, page_numbers),
         },
     }
+
+
+def extraction_messages(prompt: dict) -> list[dict[str, str]]:
+    """Return the exact messages sent to the structured extraction model."""
+    return [
+        {"role": "system", "content": "Return only the requested structured extraction."},
+        {"role": "user", "content": json.dumps(prompt, ensure_ascii=False)},
+    ]
+
+
+def extract_tax_fields(
+    artifact: ExtractionArtifact,
+    definition: FormDefinition,
+    page_numbers: list[int] | None = None,
+    response_sink: Callable[[str], None] | None = None,
+) -> TaxExtractionDraft:
+    """Make one structured model call to map parser evidence to defined fields."""
+    response_format: type[BaseModel] = TaxExtractionDraft
+    prompt = build_extraction_prompt(artifact, definition, page_numbers)
+
     kwargs = {
         "model": MODEL,
-        "messages": [
-            {"role": "system", "content": "Return only the requested structured extraction."},
-            {"role": "user", "content": json.dumps(prompt, ensure_ascii=False)},
-        ],
+        "messages": extraction_messages(prompt),
         "response_format": response_format,
         "stream": False,
     }
@@ -120,4 +190,6 @@ def extract_tax_fields(
     content = result.choices[0].message.content
     if not isinstance(content, str):
         raise ValueError("The extraction model returned no JSON content")
+    if response_sink is not None:
+        response_sink(content)
     return TaxExtractionDraft.model_validate_json(content)
