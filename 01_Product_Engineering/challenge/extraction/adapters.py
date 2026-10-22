@@ -76,7 +76,11 @@ def _bbox_from_docling(raw: dict, page_height: float) -> BoundingBox:
     return BoundingBox(x0=bbox["l"], y0=bbox["t"], x1=bbox["r"], y1=bbox["b"])
 
 
-def _docling_pages(data: dict, artifact_id: str) -> list[ExtractedPage]:
+def _docling_pages(
+    data: dict,
+    artifact_id: str,
+    ordered_refs: list[str] | None = None,
+) -> tuple[list[ExtractedPage], list[str]]:
     document = data.get("document", {})
     raw_pages = document.get("pages", {})
     page_sizes = {
@@ -87,34 +91,78 @@ def _docling_pages(data: dict, artifact_id: str) -> list[ExtractedPage]:
         page_no: [] for page_no in page_sizes
     }
     collections = (("texts", DocumentElementType.TEXT), ("tables", DocumentElementType.TABLE))
+    records = []
     for collection_name, kind in collections:
-        for index, item in enumerate(document.get(collection_name, [])):
+        records.extend(
+            (item.get("self_ref"), collection_name, index, item, kind)
+            for index, item in enumerate(document.get(collection_name, []))
+        )
+    records_by_ref = {record[0]: record for record in records if record[0]}
+    warnings = []
+    if ordered_refs is not None:
+        ordered_records = [records_by_ref[reference] for reference in ordered_refs if reference in records_by_ref]
+        seen_refs = {record[0] for record in ordered_records}
+        missing = [record for record in records if record[0] not in seen_refs]
+        if missing:
+            warnings.append(f"{len(missing)} Docling text/table items were absent from reading-order traversal")
+        records = ordered_records + missing
+
+    for _, collection_name, index, item, kind in records:
+        provenance_items = item.get("prov", [])
+        if not provenance_items:
+            warnings.append(f"{item.get('self_ref', collection_name)} has no provenance and was skipped")
+            continue
+        for prov_index, provenance in enumerate(provenance_items):
             text = item.get("text")
+            char_start = char_end = None
             if kind == DocumentElementType.TABLE:
-                text = text or item.get("data", {}).get("table_cells")
-                if not isinstance(text, str):
-                    text = json.dumps(text, ensure_ascii=False) if text else None
-            for prov_index, provenance in enumerate(item.get("prov", [])):
-                page_no = int(provenance.get("page_no", 1))
-                page_height = page_sizes.get(page_no, {}).get("height", 0)
-                raw_bbox = provenance.get("bbox")
-                location = SourceLocation(
-                    page=page_no,
-                    bbox=_bbox_from_docling(raw_bbox, page_height) if raw_bbox and page_height else None,
-                    char_start=(provenance.get("charspan") or [None, None])[0],
-                    char_end=(provenance.get("charspan") or [None, None])[1],
-                )
-                elements_by_page.setdefault(page_no, []).append(
-                    DocumentElement(
-                        id=f"{artifact_id}:{collection_name}:{index}:{prov_index}",
-                        artifact_id=artifact_id,
-                        kind=kind,
-                        text=text,
-                        locations=[location],
-                        extractor_label=item.get("label"),
-                        extractor_ref=item.get("self_ref"),
+                # Table provenance spans are not offsets into serialized table data.
+                text = json.dumps(item.get("data", {}), ensure_ascii=False) or None
+            elif len(provenance_items) > 1:
+                charspan = provenance.get("charspan")
+                original = item.get("orig")
+                if not (
+                    isinstance(original, str)
+                    and isinstance(charspan, list)
+                    and len(charspan) == 2
+                    and isinstance(charspan[0], int)
+                    and isinstance(charspan[1], int)
+                    and 0 <= charspan[0] <= charspan[1] <= len(original)
+                ):
+                    warnings.append(
+                        f"{item.get('self_ref', collection_name)} provenance {prov_index} has an invalid text span"
                     )
+                    continue
+                char_start, char_end = charspan
+                text = original[char_start:char_end]
+            else:
+                charspan = provenance.get("charspan")
+                if (
+                    isinstance(charspan, list)
+                    and len(charspan) == 2
+                    and all(isinstance(value, int) for value in charspan)
+                ):
+                    char_start, char_end = charspan
+            page_no = int(provenance.get("page_no", 1))
+            page_height = page_sizes.get(page_no, {}).get("height", 0)
+            raw_bbox = provenance.get("bbox")
+            location = SourceLocation(
+                page=page_no,
+                bbox=_bbox_from_docling(raw_bbox, page_height) if raw_bbox and page_height else None,
+                char_start=char_start,
+                char_end=char_end,
+            )
+            elements_by_page.setdefault(page_no, []).append(
+                DocumentElement(
+                    id=f"{artifact_id}:{collection_name}:{index}:{prov_index}",
+                    artifact_id=artifact_id,
+                    kind=kind,
+                    text=text,
+                    locations=[location],
+                    extractor_label=item.get("label"),
+                    extractor_ref=item.get("self_ref"),
                 )
+            )
 
     return [
         ExtractedPage(
@@ -125,6 +173,23 @@ def _docling_pages(data: dict, artifact_id: str) -> list[ExtractedPage]:
             elements=elements_by_page.get(page_no, []),
         )
         for page_no, dimensions in sorted(page_sizes.items())
+    ], warnings
+
+
+def _docling_reading_order_refs(result) -> list[str] | None:
+    """Return source refs in Docling's tree order when a live document is available."""
+    document = getattr(result, "document", None)
+    if document is None or not hasattr(document, "iterate_items"):
+        return None
+    from docling_core.types.doc.common.content_layer import ContentLayer
+
+    return [
+        item.self_ref
+        for item, _ in document.iterate_items(
+            included_content_layers=set(ContentLayer),
+            traverse_pictures=False,
+        )
+        if hasattr(item, "self_ref")
     ]
 
 
@@ -228,7 +293,11 @@ class DoclingAdapter(ExtractionArtifactAdapter):
         data = _plain(parsed_file.result)
         page_count = int(data.get("input", {}).get("page_count", 0))
         artifact_id = str(uuid4())
-        pages = _docling_pages(data, artifact_id)
+        pages, adaptation_warnings = _docling_pages(
+            data,
+            artifact_id,
+            _docling_reading_order_refs(parsed_file.result),
+        )
         errors = data.get("errors", [])
         status_value = str(data.get("status", "success")).lower()
         status = (
@@ -236,7 +305,7 @@ class DoclingAdapter(ExtractionArtifactAdapter):
             else ExtractionArtifactStatus.PARTIAL if errors or len(pages) < page_count
             else ExtractionArtifactStatus.COMPLETED
         )
-        warnings = [str(error.get("error_message", error)) for error in errors]
+        warnings = [str(error.get("error_message", error)) for error in errors] + adaptation_warnings
         return self._build_artifact(parsed_file, page_count, pages, status, warnings)
 
 
