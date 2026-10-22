@@ -5,6 +5,7 @@ from uuid import uuid4
 import gradio as gr
 from pydantic import BaseModel, Field
 
+from config import config_from_env
 from extraction.adapters import adapter_for
 from extraction.parse import parse_document
 from llm import extract_tax_fields
@@ -16,7 +17,6 @@ from schemas.audit.audit import (
 )
 from schemas.common.enum import (
     ObservationStatus,
-    Parser,
     ReviewStatus,
 )
 from schemas.domain.forms.factory import (
@@ -28,6 +28,8 @@ from schemas.domain.tax_document import TaxDocument, TaxEvidence, TaxFormField
 from schemas.extraction.extraction import ExtractionArtifact
 
 logger = logging.getLogger(__name__)
+
+BIFROST_CONFIG = config_from_env()
 
 class Request(BaseModel):
     """Files submitted through the UI."""
@@ -46,11 +48,11 @@ class Response(BaseModel):
     audit_result: AuditResult
 
 def solve(req: Request) -> Response:
-    parsed_files = parse_document(Parser.DOCLING, req.files)
+    parsed_files = parse_document(BIFROST_CONFIG.parser, req.files)
     if len(parsed_files) != 1:
         raise ValueError("This MVP accepts one PDF at a time")
 
-    artifact = adapter_for(Parser.DOCLING).adapt(parsed_files[0])
+    artifact = adapter_for(BIFROST_CONFIG.parser).adapt(parsed_files[0])
     logger.info(
         "Parsed %s with %s: %d pages, %d elements, %d warnings",
         artifact.source_document.filename,

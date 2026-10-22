@@ -11,6 +11,7 @@ from importlib.metadata import PackageNotFoundError, version
 from pathlib import Path
 from uuid import uuid4
 
+from config import config_from_env
 from schemas.common.enum import (
     DocumentElementType,
     ExtractionArtifactFormat,
@@ -27,11 +28,7 @@ from schemas.extraction.extraction import (
 )
 
 
-PARSER_CONFIG = {
-    Parser.DOCLING: {"do_ocr": True, "ocr_mode": "full_page", "do_table_structure": True},
-    Parser.LITEPARSE: {"ocr_enabled": False, "extract_blocks": True},
-}
-
+BIFROST_CONFIG = config_from_env()
 
 def _plain(value):
     if hasattr(value, "model_dump"):
@@ -254,7 +251,7 @@ def _liteparse_pages(result, artifact_id: str) -> list[ExtractedPage]:
 class ExtractionArtifactAdapter(ABC):
     """Adapter interface: parser-specific results become ExtractionArtifact."""
 
-    parser: Parser
+    parser: Parser = BIFROST_CONFIG.parser
 
     @abstractmethod
     def adapt(self, parsed_file) -> ExtractionArtifact:
@@ -275,7 +272,7 @@ class ExtractionArtifactAdapter(ABC):
             source_document=source,
             parser=self.parser,
             parser_version=_package_version(self.parser),
-            config=PARSER_CONFIG[self.parser],
+            config=BIFROST_CONFIG.parser_config[self.parser],
             status=status,
             format=ExtractionArtifactFormat.JSON,
             created_at=datetime.now(timezone.utc),
