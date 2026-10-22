@@ -18,6 +18,7 @@ class BoundingBox(BaseModel):
         return self
 
 class SourceLocation(BaseModel):
+    """Location in a source element; character offsets are item-local when supplied."""
     page: int = Field(ge=1)
     bbox: BoundingBox | None = None
     char_start: int | None = Field(default=None, ge=0)
