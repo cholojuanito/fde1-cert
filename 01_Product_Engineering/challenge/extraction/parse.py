@@ -2,7 +2,9 @@ from dataclasses import dataclass
 from gradio import FileData
 
 from schemas.common.enum import Parser
+from config import config_from_env
 
+PARSER_CONFIG = config_from_env()
 
 @dataclass
 class ParsedFile:
@@ -17,10 +19,10 @@ def _parse_with_docling(files: list[FileData]) -> list[ParsedFile]:
     from docling.document_converter import DocumentConverter, PdfFormatOption
 
     pipeline_options = PdfPipelineOptions()
-    pipeline_options.do_ocr = True
-    pipeline_options.ocr_options.mode = OcrMode.FULL_PAGE
-    pipeline_options.do_table_structure = True
-    pipeline_options.table_structure_options = TableStructureOptions(do_cell_matching=True)
+    pipeline_options.do_ocr = PARSER_CONFIG.get("do_ocr")
+    pipeline_options.ocr_options.mode = PARSER_CONFIG.get("ocr_mode")
+    pipeline_options.do_table_structure = PARSER_CONFIG.get("do_table_structure")
+    pipeline_options.table_structure_options = TableStructureOptions(do_cell_matching= PARSER_CONFIG.get("do_cell_matching"))
     converter = DocumentConverter(
         format_options={InputFormat.PDF: PdfFormatOption(pipeline_options=pipeline_options)}
     )

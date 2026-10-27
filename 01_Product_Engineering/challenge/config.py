@@ -19,11 +19,15 @@ class Config:
     parser: Parser
     parser_config: dict[Parser,dict]
 
+    def get(self, key: str, default=None):
+        return self.parser_config.get(self.parser, {}).get(key, default)
+
 def _docling_config() -> dict:
     return {
         "do_ocr": env_bool("DOCLING_DO_OCR", False),
         "ocr_mode": os.getenv("DOCLING_OCR_MODE", "full_page"),
-        "do_table_structure": env_bool("DOCLING_DO_TABLE_STRUCTURE", False)
+        "do_table_structure": env_bool("DOCLING_DO_TABLE_STRUCTURE", False),
+        "do_cell_matching": env_bool("DOCLING_TABLE_DO_CELL_MATCHING", False)
     }
 
 def _liteparse_config() -> dict:
