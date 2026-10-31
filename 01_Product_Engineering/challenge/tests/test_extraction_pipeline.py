@@ -205,7 +205,7 @@ class ParserIntegrationTests(unittest.TestCase):
         )
 
     def test_docling_parse_converts_to_extraction_artifact(self):
-        parsed_files = parse_document(Parser.DOCLING, [self.file_data])
+        parsed_files = parse_document([self.file_data], Parser.DOCLING)
         artifact = adapter_for(Parser.DOCLING).adapt(parsed_files[0])
 
         self.assertEqual(artifact.parser, Parser.DOCLING)
@@ -226,7 +226,7 @@ class ParserIntegrationTests(unittest.TestCase):
         )
 
     def test_liteparse_parse_converts_to_extraction_artifact(self):
-        parsed_files = parse_document(Parser.LITEPARSE, [self.file_data])
+        parsed_files = parse_document([self.file_data], Parser.LITEPARSE)
         artifact = adapter_for(Parser.LITEPARSE).adapt(parsed_files[0])
 
         self.assertEqual(artifact.parser, Parser.LITEPARSE)

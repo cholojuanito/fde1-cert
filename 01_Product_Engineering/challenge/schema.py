@@ -48,7 +48,7 @@ class Response(BaseModel):
     audit_result: AuditResult
 
 def solve(req: Request) -> Response:
-    parsed_files = parse_document(BIFROST_CONFIG.parser, req.files)
+    parsed_files = parse_document(req.files, BIFROST_CONFIG.parser)
     if len(parsed_files) != 1:
         raise ValueError("This MVP accepts one PDF at a time")
 

@@ -84,9 +84,11 @@ PARSERS = {
     Parser.LITEPARSE: _parse_with_liteparse,
 }
 
-def parse_document(parser: Parser, files: list[FileData]) -> list[ParsedFile]:
+
+def parse_document(files: list[FileData], parser: Parser | None = None) -> list[ParsedFile]:
+    active_parser = parser or PARSER_CONFIG.parser
     try:
-        parse = PARSERS[parser]
+        parse = PARSERS[active_parser]
     except KeyError as exc:
         raise ValueError(f"Unsupported parser: {parser}") from exc
     return parse(files)
