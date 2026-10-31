@@ -74,33 +74,18 @@ would notice.
     - address
     - social security number (SSN) or EIN
     - phone number
-    - percent of ownership
+    - percent of ownership/profit/loss/capital/liabilities
     - limited partner? (yes/no)
     - entity code - enum of options
     - date of affliation
     - date of withdrawal
-  - apportionment factors -- divvy up company assets for tax accuracy
-    - property
-    - payroll
-    - sales
-  - income, deductions, credits, losses -- lots of fields involved here, refer to PDF above or json schema I will create
-2. document metadata
-  - file info -- general file related info
-    - doc id/filename
-    - file hashes (sha256 or md5)
-    - mime type
-    - file size
-  - document structure -- any info about the documents or sub documents in a single PDF
-    - number of pages
-    - forms detected i.e TC65 vs TC20 and the various schedules in the document
-    - states/jurisdiction i.e. federal vs UT vs CA
-    - applicable tax years
-  - processing info -- info about the processing pipeline
-    - timestamp
-    - duration
-    - processing pipeline version
-    - model id/name
-    - ocr engine used
+    - apportionment factors -- divvy up company assets for tax accuracy
+      - property
+      - payroll
+      - sales
+    - etc.
+  - the partner's income, deductions, credits, losses
+    - lots of fields involved here, refer to golden PDFs and extractions
 ---
 
 ### **Output Excel Filename Patterns**
@@ -124,5 +109,6 @@ would notice.
 | --- | --- | --- |
 | 1 | Charter Inputs and Outputs | After so more talks with the stakeholders it became apparent that this would be an extract and review task instead of just review. I have no access to the extracted outputs from their existing K-1x software and it would be difficult to get access. Pluswe think this blends better with the agentic approach this course asks for. |
 | 3 | Retrieval approach | <!-- TC3 --> |
+| 3 | Charter output | Refined the outputs to allow for more agentic usage and RAG, relying less on predefined tax year/jurisdiction combos and more on letting the model abstractly define parts of each form and supplemental documents. And removing document metadata from the outputs. |
 | 5 | Agent architecture | <!-- TC5 --> |
 | 8 | Model | <!-- TC8 --> |
