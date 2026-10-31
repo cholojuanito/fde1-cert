@@ -25,7 +25,7 @@ class Config:
 def _docling_config() -> dict:
     return {
         "do_ocr": env_bool("DOCLING_DO_OCR", False),
-        "ocr_mode": os.getenv("DOCLING_OCR_MODE", "full_page"),
+        "ocr_mode": os.getenv("DOCLING_OCR_MODE", "default"),
         "do_table_structure": env_bool("DOCLING_DO_TABLE_STRUCTURE", False),
         "do_cell_matching": env_bool("DOCLING_TABLE_DO_CELL_MATCHING", False)
     }
