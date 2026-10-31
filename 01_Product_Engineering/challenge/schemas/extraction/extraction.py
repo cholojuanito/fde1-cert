@@ -46,6 +46,8 @@ class DocumentElement(BaseModel):
     image_uri: str | None = None
     extractor_label: str | None = None
     extractor_ref: str | None = None
+    # Canonical table-cell references are parser provenance, not model content.
+    table_cell_element_ids: dict[str, list[str]] = Field(default_factory=dict)
 
 class SourceDocument(BaseModel):
     id: str
