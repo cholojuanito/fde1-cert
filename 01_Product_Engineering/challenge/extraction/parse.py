@@ -31,6 +31,43 @@ def _parse_with_docling(files: list[FileData]) -> list[ParsedFile]:
         for file in files
     ]
 
+def _parse_with_vlm(files: list[FileData]) -> list[ParsedFile]:
+    """Convert pages locally with Docling's VLM pipeline."""
+    from docling.datamodel import vlm_model_specs
+    from docling.datamodel.base_models import InputFormat
+    from docling.datamodel.pipeline_options import VlmPipelineOptions
+    from docling.document_converter import DocumentConverter, PdfFormatOption
+    from docling.pipeline.vlm_pipeline import VlmPipeline
+
+    preset = PARSER_CONFIG.parser_config[Parser.VLM]["preset"]
+    preset_names = {
+        "granite_docling": "GRANITEDOCLING_TRANSFORMERS",
+        "granite_docling_vllm": "GRANITEDOCLING_VLLM",
+    }
+    try:
+        vlm_options = getattr(vlm_model_specs, preset_names.get(preset, preset.upper()))
+    except AttributeError as exc:
+        raise ValueError(
+            f"Installed Docling does not expose requested VLM preset {preset!r}"
+        ) from exc
+    options = VlmPipelineOptions(
+        vlm_options=vlm_options,
+        generate_page_images=PARSER_CONFIG.parser_config[Parser.VLM][
+            "generate_page_images"
+        ],
+    )
+    converter = DocumentConverter(
+        format_options={
+            InputFormat.PDF: PdfFormatOption(
+                pipeline_cls=VlmPipeline, pipeline_options=options
+            )
+        }
+    )
+    return [
+        ParsedFile(file.orig_name, file.path, converter.convert(file.path))
+        for file in files
+    ]
+
 
 def _parse_with_liteparse(files: list[FileData]) -> list[ParsedFile]:
     from liteparse import LiteParse
@@ -43,7 +80,8 @@ def _parse_with_liteparse(files: list[FileData]) -> list[ParsedFile]:
 
 PARSERS = {
     Parser.DOCLING: _parse_with_docling,
-    Parser.LITEPARSE: _parse_with_liteparse
+    Parser.VLM: _parse_with_vlm,
+    Parser.LITEPARSE: _parse_with_liteparse,
 }
 
 def parse_document(parser: Parser, files: list[FileData]) -> list[ParsedFile]:
