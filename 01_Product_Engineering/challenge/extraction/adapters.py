@@ -30,6 +30,7 @@ from schemas.extraction.extraction import (
 
 BIFROST_CONFIG = config_from_env()
 
+
 def _plain(value):
     if hasattr(value, "model_dump"):
         return value.model_dump(mode="json")
@@ -40,12 +41,16 @@ def _plain(value):
     if isinstance(value, (list, tuple)):
         return [_plain(item) for item in value]
     if hasattr(value, "__dict__"):
-        return {key: _plain(item) for key, item in vars(value).items() if not key.startswith("_")}
+        return {
+            key: _plain(item)
+            for key, item in vars(value).items()
+            if not key.startswith("_")
+        }
     return value
 
 
 def _package_version(parser: Parser) -> str:
-    package = "docling" if parser == Parser.DOCLING else "liteparse"
+    package = "docling" if parser in {Parser.DOCLING, Parser.VLM} else "liteparse"
     try:
         return version(package)
     except PackageNotFoundError:
@@ -66,11 +71,16 @@ def _source_document(path: str, filename: str, page_count: int) -> SourceDocumen
 def _bbox_from_docling(raw: dict, page_height: float) -> BoundingBox:
     bbox = raw
     if bbox.get("coord_origin", "BOTTOMLEFT") == "BOTTOMLEFT":
-        return BoundingBox(
-            x0=bbox["l"], y0=page_height - bbox["t"],
-            x1=bbox["r"], y1=page_height - bbox["b"],
-        )
-    return BoundingBox(x0=bbox["l"], y0=bbox["t"], x1=bbox["r"], y1=bbox["b"])
+        left, right = bbox["l"], bbox["r"]
+        top, bottom = page_height - bbox["t"], page_height - bbox["b"]
+    else:
+        left, right, top, bottom = bbox["l"], bbox["r"], bbox["t"], bbox["b"]
+    return BoundingBox(
+        x0=min(left, right),
+        y0=min(top, bottom),
+        x1=max(left, right),
+        y1=max(top, bottom),
+    )
 
 
 def _docling_pages(
@@ -81,13 +91,15 @@ def _docling_pages(
     document = data.get("document", {})
     raw_pages = document.get("pages", {})
     page_sizes = {
-        int(page_no): details.get("size", {})
-        for page_no, details in raw_pages.items()
+        int(page_no): details.get("size", {}) for page_no, details in raw_pages.items()
     }
     elements_by_page: dict[int, list[DocumentElement]] = {
         page_no: [] for page_no in page_sizes
     }
-    collections = (("texts", DocumentElementType.TEXT), ("tables", DocumentElementType.TABLE))
+    collections = (
+        ("texts", DocumentElementType.TEXT),
+        ("tables", DocumentElementType.TABLE),
+    )
     records = []
     for collection_name, kind in collections:
         records.extend(
@@ -97,17 +109,25 @@ def _docling_pages(
     records_by_ref = {record[0]: record for record in records if record[0]}
     warnings = []
     if ordered_refs is not None:
-        ordered_records = [records_by_ref[reference] for reference in ordered_refs if reference in records_by_ref]
+        ordered_records = [
+            records_by_ref[reference]
+            for reference in ordered_refs
+            if reference in records_by_ref
+        ]
         seen_refs = {record[0] for record in ordered_records}
         missing = [record for record in records if record[0] not in seen_refs]
         if missing:
-            warnings.append(f"{len(missing)} Docling text/table items were absent from reading-order traversal")
+            warnings.append(
+                f"{len(missing)} Docling text/table items were absent from reading-order traversal"
+            )
         records = ordered_records + missing
 
     for _, collection_name, index, item, kind in records:
         provenance_items = item.get("prov", [])
         if not provenance_items:
-            warnings.append(f"{item.get('self_ref', collection_name)} has no provenance and was skipped")
+            warnings.append(
+                f"{item.get('self_ref', collection_name)} has no provenance and was skipped"
+            )
             continue
         for prov_index, provenance in enumerate(provenance_items):
             text = item.get("text")
@@ -127,11 +147,12 @@ def _docling_pages(
                     and 0 <= charspan[0] <= charspan[1] <= len(original)
                 ):
                     warnings.append(
-                        f"{item.get('self_ref', collection_name)} provenance {prov_index} has an invalid text span"
+                        f"{item.get('self_ref', collection_name)} provenance {prov_index} has an invalid text span; retaining unsplit source text"
                     )
-                    continue
-                char_start, char_end = charspan
-                text = original[char_start:char_end]
+                    text = item.get("text") or original
+                else:
+                    char_start, char_end = charspan
+                    text = original[char_start:char_end]
             else:
                 charspan = provenance.get("charspan")
                 if (
@@ -145,7 +166,9 @@ def _docling_pages(
             raw_bbox = provenance.get("bbox")
             location = SourceLocation(
                 page=page_no,
-                bbox=_bbox_from_docling(raw_bbox, page_height) if raw_bbox and page_height else None,
+                bbox=_bbox_from_docling(raw_bbox, page_height)
+                if raw_bbox and page_height
+                else None,
                 char_start=char_start,
                 char_end=char_end,
             )
@@ -221,9 +244,13 @@ def _liteparse_pages(result, artifact_id: str) -> list[ExtractedPage]:
             location = SourceLocation(
                 page=int(page.page_num),
                 bbox=BoundingBox(
-                    x0=float(bbox.x), y0=float(bbox.y),
-                    x1=float(bbox.x + bbox.width), y1=float(bbox.y + bbox.height),
-                ) if bbox else None,
+                    x0=float(bbox.x),
+                    y0=float(bbox.y),
+                    x1=float(bbox.x + bbox.width),
+                    y1=float(bbox.y + bbox.height),
+                )
+                if bbox
+                else None,
             )
             elements.append(
                 DocumentElement(
@@ -257,6 +284,10 @@ class ExtractionArtifactAdapter(ABC):
     def adapt(self, parsed_file) -> ExtractionArtifact:
         """Translate one parser result into the application extraction model."""
 
+    @abstractmethod
+    def to_markdown(self, parsed_file) -> str:
+        """Export as markdown"""
+
     def _build_artifact(
         self,
         parsed_file,
@@ -286,6 +317,9 @@ class DoclingAdapter(ExtractionArtifactAdapter):
 
     parser = Parser.DOCLING
 
+    def to_markdown(self, parsed_file) -> str:
+        return parsed_file.result.document.export_to_markdown()
+
     def adapt(self, parsed_file) -> ExtractionArtifact:
         data = _plain(parsed_file.result)
         page_count = int(data.get("input", {}).get("page_count", 0))
@@ -298,18 +332,31 @@ class DoclingAdapter(ExtractionArtifactAdapter):
         errors = data.get("errors", [])
         status_value = str(data.get("status", "success")).lower()
         status = (
-            ExtractionArtifactStatus.FAILED if status_value in {"failure", "failed"}
-            else ExtractionArtifactStatus.PARTIAL if errors or len(pages) < page_count
+            ExtractionArtifactStatus.FAILED
+            if status_value in {"failure", "failed"}
+            else ExtractionArtifactStatus.PARTIAL
+            if errors or len(pages) < page_count
             else ExtractionArtifactStatus.COMPLETED
         )
-        warnings = [str(error.get("error_message", error)) for error in errors] + adaptation_warnings
+        warnings = [
+            str(error.get("error_message", error)) for error in errors
+        ] + adaptation_warnings
         return self._build_artifact(parsed_file, page_count, pages, status, warnings)
+
+
+class DoclingVlmAdapter(DoclingAdapter):
+    """Adapt a Docling VLM conversion with the same source-evidence contract."""
+
+    parser = Parser.VLM
 
 
 class LiteParseAdapter(ExtractionArtifactAdapter):
     """Adapt LiteParse ParseResult objects to the shared artifact model."""
 
     parser = Parser.LITEPARSE
+
+    def to_markdown(self, parsed_file) -> str:
+        raise NotImplementedError()
 
     def adapt(self, parsed_file) -> ExtractionArtifact:
         result = parsed_file.result
@@ -318,7 +365,8 @@ class LiteParseAdapter(ExtractionArtifactAdapter):
         pages = _liteparse_pages(result, artifact_id)
         warnings = [str(error) for error in (result.page_errors or [])]
         status = (
-            ExtractionArtifactStatus.PARTIAL if warnings or len(pages) < page_count
+            ExtractionArtifactStatus.PARTIAL
+            if warnings or len(pages) < page_count
             else ExtractionArtifactStatus.COMPLETED
         )
         return self._build_artifact(parsed_file, page_count, pages, status, warnings)
@@ -326,6 +374,7 @@ class LiteParseAdapter(ExtractionArtifactAdapter):
 
 _ADAPTERS: dict[Parser, type[ExtractionArtifactAdapter]] = {
     Parser.DOCLING: DoclingAdapter,
+    Parser.VLM: DoclingVlmAdapter,
     Parser.LITEPARSE: LiteParseAdapter,
 }
 

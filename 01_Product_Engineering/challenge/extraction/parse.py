@@ -22,6 +22,7 @@ def _parse_with_docling(files: list[FileData]) -> list[ParsedFile]:
     pipeline_options.do_ocr = PARSER_CONFIG.get("do_ocr")
     pipeline_options.ocr_options.mode = PARSER_CONFIG.get("ocr_mode")
     pipeline_options.do_table_structure = PARSER_CONFIG.get("do_table_structure")
+    pipeline_options.generate_page_images = PARSER_CONFIG.get("generate_page_images")
     pipeline_options.table_structure_options = TableStructureOptions(do_cell_matching= PARSER_CONFIG.get("do_cell_matching"))
     converter = DocumentConverter(
         format_options={InputFormat.PDF: PdfFormatOption(pipeline_options=pipeline_options)}
