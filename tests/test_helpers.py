@@ -62,6 +62,24 @@ def test_kwargs_omits_api_base_when_unset(monkeypatch):
     assert "api_base" not in cfg.kwargs()
 
 
+def test_server_tools_opt_out_goes_only_to_unsloth(monkeypatch):
+    """Other providers reject `enable_tools`, so only an Unsloth key gets it."""
+    monkeypatch.setenv("VLM_MODEL", "openai/vision")
+    monkeypatch.setenv("VLM_API_BASE", "http://127.0.0.1:8890/v1")
+    monkeypatch.setenv("VLM_API_KEY", "sk-unsloth-abc")
+    monkeypatch.setenv("LLM_API_BASE", "http://127.0.0.1:8888/v1")
+    monkeypatch.setenv("OPENAI_API_KEY", "sk-unsloth-def")
+    cfg = config.from_env(Path("/tmp"))
+    assert cfg.without_server_tools(cfg.vlm_kwargs())["extra_body"] == {"enable_tools": False}
+    assert cfg.without_server_tools(cfg.kwargs())["extra_body"] == {"enable_tools": False}
+
+    monkeypatch.setenv("VLM_API_KEY", "sk-proj-hosted")
+    monkeypatch.setenv("OPENAI_API_KEY", "sk-proj-hosted")
+    cfg = config.from_env(Path("/tmp"))
+    assert "extra_body" not in cfg.without_server_tools(cfg.vlm_kwargs())
+    assert "extra_body" not in cfg.without_server_tools(cfg.kwargs())
+
+
 def test_bootstrap_names_the_missing_variable(monkeypatch, tmp_path):
     (tmp_path / "pyproject.toml").write_text("")
     (tmp_path / "helpers").mkdir()
