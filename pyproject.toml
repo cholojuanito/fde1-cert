@@ -123,7 +123,6 @@ helpers-pending = [
     "guardrails",   # guardrails
     "llm",          # the packaged model call, referenced from retrieval onward
     "memory",       # memory
-    "tools",        # agent architecture
     "trace",        # agent architecture
 ]
 
