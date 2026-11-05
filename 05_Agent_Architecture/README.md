@@ -23,7 +23,6 @@ with a comparison you actually ran.
 | --- | --- | --- | --- | --- |
 | S9 | **No notebook.** [`Demo_Critique_Rubric`](./sessions/S9_Demo_Critique_Rubric.md) | Your five-minute demo, timed, then a sponsor's questions from the room. You leave with the ones you could not answer. | Coming soon | Coming soon |
 | S10 | [`Six_Ways_to_Call_a_Capability`](./sessions/S10_Six_Ways_to_Call_a_Capability.py) | **FastMCP**: one function served six ways, a counter separating model calls from capability calls on all six (MCP over stdio included), and a sweep showing whose token bill grows. | Coming soon | Coming soon |
-| S10 deep dive | [`Six_Ways_to_Call_a_Capability_Fundamentals`](./sessions/S10_Six_Ways_to_Call_a_Capability_Fundamentals.py) | *Optional.* The same six ways built by hand: schema, dispatcher, manifest and sandbox, with the same counter and sweep. | Coming soon | Coming soon |
 
 | 📝 Technical Challenge | 📁 Feedback |
 | --- | --- |
@@ -103,7 +102,6 @@ environment instead:
 
 ```powershell
 uv run python scripts/nb.py 05_Agent_Architecture\sessions\S10_Six_Ways_to_Call_a_Capability.py
-uv run python scripts/nb.py 05_Agent_Architecture\sessions\S10_Six_Ways_to_Call_a_Capability_Fundamentals.py
 ```
 
 The script installs the `week5` group into `.venv` (`uv sync --inexact

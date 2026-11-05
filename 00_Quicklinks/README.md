@@ -67,7 +67,6 @@ Quicklinks are here to help you **easily navigate each week's materials** for th
 |:-----------|:-------------|:-------------|
 | [Session 9 - Demo Day, with the critique rubric](../05_Agent_Architecture/sessions/S9_Demo_Critique_Rubric.md) | Coming soon | Coming soon |
 | [Session 10 - Six Ways to Call a Capability](../05_Agent_Architecture/sessions/S10_Six_Ways_to_Call_a_Capability.py) | Coming soon | Coming soon |
-| [Session 10 deep dive - the six ways by hand (self-study)](../05_Agent_Architecture/sessions/S10_Six_Ways_to_Call_a_Capability_Fundamentals.py) | — | — |
 
 ---
 
