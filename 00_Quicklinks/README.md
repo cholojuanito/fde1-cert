@@ -57,4 +57,17 @@ Quicklinks are here to help you **easily navigate each week's materials** for th
 
 ---
 
+## [Week 5 - Agent Architecture](../05_Agent_Architecture/)
+
+🧑‍💻 Your demo in front of the room, then one capability six ways — tool, skill, subagent, MCP, Code Mode, UTCP — measured, so the architecture row in your decisions has numbers behind it
+
+**👨‍💻 [Weekly Technical Challenge](../05_Agent_Architecture/challenge)**
+
+| 🎓 Session | ⏺️ Recording | 🖼️ Slides |
+|:-----------|:-------------|:-------------|
+| [Session 9 - Demo Day, with the critique rubric](../05_Agent_Architecture/sessions/S9_Demo_Critique_Rubric.md) | Coming soon | Coming soon |
+| [Session 10 - Six Ways to Call a Capability](../05_Agent_Architecture/sessions/S10_Six_Ways_to_Call_a_Capability.py) | Coming soon | Coming soon |
+
+---
+
 📖 Lost on a word? [`GLOSSARY.md`](../GLOSSARY.md) has every term the course has used so far, one sentence each, with the week it first comes up.
