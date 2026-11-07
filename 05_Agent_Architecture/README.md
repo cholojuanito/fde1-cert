@@ -21,8 +21,8 @@ with a comparison you actually ran.
 
 | # | 📓 Material | What you'll build | ⏺️ Recording | 🖼️ Slides |
 | --- | --- | --- | --- | --- |
-| S9 | **No notebook.** [`Demo_Critique_Rubric`](./sessions/S9_Demo_Critique_Rubric.md) | Your five-minute demo, timed, then a sponsor's questions from the room. You leave with the ones you could not answer. | Coming soon | Coming soon |
-| S10 | [`Six_Ways_to_Call_a_Capability`](./sessions/S10_Six_Ways_to_Call_a_Capability.py) | **FastMCP**: one function served six ways, a counter separating model calls from capability calls on all six (MCP over stdio included), and a sweep showing whose token bill grows. | Coming soon | Coming soon |
+| S9 | **No notebook.** [`Demo_Critique_Rubric`](./sessions/S9_Demo_Critique_Rubric.md) | Your five-minute demo, timed, then a sponsor's questions from the room. You leave with the ones you could not answer. | [Recording!](https://us02web.zoom.us/rec/share/B2k2V0xkdzoahopuC2kifjhugTvs2owjTF3KkIahYfF5dga3g6Ov6a5JU6DTw3MF.hH0_5nbax9XDzy4X) <br> passcode: `1yni.s*N` | [Slides](https://canva.link/xrm1agdozo9i7kg) |
+| S10 | [`Six_Ways_to_Call_a_Capability`](./sessions/S10_Six_Ways_to_Call_a_Capability.py) | **FastMCP**: one function served six ways, a counter separating model calls from capability calls on all six (MCP over stdio included), and a sweep showing whose token bill grows. | [Recording!](https://us02web.zoom.us/rec/share/7kCBUCJ6mQ2oXFt0NJiZIwvRTmUX0EYNo5-DMTXlIh4eCWxMEJbN0oQ764djovzc.8FmORNXr3IQXmZTK) <br> passcode: `&AEr4mmZ` | [Slides](https://canva.link/n1itpi53q119stz) |
 
 | 📝 Technical Challenge | 📁 Feedback |
 | --- | --- |
