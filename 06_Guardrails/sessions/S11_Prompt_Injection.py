@@ -21,14 +21,6 @@ def _():
 
 @app.cell(hide_code=True)
 def _(mo):
-    import pathlib
-
-    DIAGRAMS = pathlib.Path(mo.notebook_dir()) / "data" / "diagrams"
-    return (DIAGRAMS,)
-
-
-@app.cell(hide_code=True)
-def _(mo):
     mo.md(r"""
     # Session 11: Prompt Injection
 
@@ -147,6 +139,13 @@ def _(mo):
     sys.path.insert(0, str(Path(mo.notebook_dir()).parent.parent))
     from helpers import nb, ui
 
+    return Path, json, nb, os, shutil, subprocess, tempfile, ui
+
+
+@app.cell
+def _(mo, nb, shutil):
+    # A separate cell from the imports, so the endpoint gate below stops the
+    # cells that call a model and leaves the diagrams rendering.
     CFG = nb.bootstrap()
 
     mo.stop(
@@ -180,7 +179,7 @@ def _(mo):
     print(f"✅ {CFG}")
     print(f"✅ attack target: {CFG.injection_model} @ {CFG.injection_api_base}")
     print(f"✅ npx: {NPX}" if NPX else "⚠️ npx not found: install Node.js 22.22+ before pressing any button")
-    return CFG, NODE_MISSING, NPX, Path, json, os, subprocess, tempfile, ui
+    return CFG, NODE_MISSING, NPX
 
 
 @app.cell(hide_code=True)
@@ -435,8 +434,8 @@ def _(mo):
 
 
 @app.cell(hide_code=True)
-def _(DIAGRAMS, mo):
-    mo.image(src=str(DIAGRAMS / "S11_Prompt_Injection_task1.png"), rounded=True)
+def _(ui):
+    ui.diagram("S11_Prompt_Injection_task1")
     return
 
 
@@ -546,8 +545,8 @@ def _(mo):
 
 
 @app.cell(hide_code=True)
-def _(DIAGRAMS, mo):
-    mo.image(src=str(DIAGRAMS / "S11_Prompt_Injection_task2.png"), rounded=True)
+def _(ui):
+    ui.diagram("S11_Prompt_Injection_task2")
     return
 
 
@@ -775,8 +774,8 @@ def _(mo):
 
 
 @app.cell(hide_code=True)
-def _(DIAGRAMS, mo):
-    mo.image(src=str(DIAGRAMS / "S11_Prompt_Injection_task3.png"), rounded=True)
+def _(ui):
+    ui.diagram("S11_Prompt_Injection_task3")
     return
 
 
@@ -959,8 +958,8 @@ def _(mo):
 
 
 @app.cell(hide_code=True)
-def _(DIAGRAMS, mo):
-    mo.image(src=str(DIAGRAMS / "S11_Prompt_Injection_task4.png"), rounded=True)
+def _(ui):
+    ui.diagram("S11_Prompt_Injection_task4")
     return
 
 
@@ -1140,8 +1139,8 @@ def _(mo):
 
 
 @app.cell(hide_code=True)
-def _(DIAGRAMS, mo):
-    mo.image(src=str(DIAGRAMS / "S11_Prompt_Injection_task5.png"), rounded=True)
+def _(ui):
+    ui.diagram("S11_Prompt_Injection_task5")
     return
 
 

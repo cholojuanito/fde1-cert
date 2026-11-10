@@ -23,14 +23,6 @@ def _():
 
 @app.cell(hide_code=True)
 def _(mo):
-    import pathlib
-
-    DIAGRAMS = pathlib.Path(mo.notebook_dir()) / "data" / "diagrams"
-    return (DIAGRAMS,)
-
-
-@app.cell(hide_code=True)
-def _(mo):
     mo.md(r"""
     # Session 12: The Guardrail Ladder
 
@@ -178,6 +170,13 @@ def _(mo):
     sys.path.insert(0, str(Path(mo.notebook_dir()).parent.parent))
     from helpers import nb, ui
 
+    return Path, json, nb, np, time, ui
+
+
+@app.cell
+def _(Path, json, mo, nb, np):
+    # A separate cell from the imports, so the endpoint gate below stops the
+    # cells that call a model and leaves the diagrams rendering.
     CFG = nb.bootstrap()
 
     # Recorded logits from a real forward pass, kept next to this notebook so it
@@ -211,7 +210,7 @@ def _(mo):
     print(f"✅ {CFG}")
     print(f"✅ judge runs on: {CFG.injection_model} @ {CFG.injection_api_base}")
     print(f"✅ {LOGITS.shape[0]} recorded positions")
-    return CFG, LOGITS, Path, TOKEN_IDS, VOCAB, json, np, time, ui
+    return CFG, LOGITS, TOKEN_IDS, VOCAB
 
 
 @app.cell(hide_code=True)
@@ -495,8 +494,8 @@ def _(mo):
 
 
 @app.cell(hide_code=True)
-def _(DIAGRAMS, mo):
-    mo.image(src=str(DIAGRAMS / "S12_The_Guardrail_Ladder_task1.png"), rounded=True)
+def _(ui):
+    ui.diagram("S12_The_Guardrail_Ladder_task1")
     return
 
 
@@ -638,8 +637,8 @@ def _(mo):
 
 
 @app.cell(hide_code=True)
-def _(DIAGRAMS, mo):
-    mo.image(src=str(DIAGRAMS / "S12_The_Guardrail_Ladder_task2.png"), rounded=True)
+def _(ui):
+    ui.diagram("S12_The_Guardrail_Ladder_task2")
     return
 
 
@@ -752,8 +751,8 @@ def _(mo):
 
 
 @app.cell(hide_code=True)
-def _(DIAGRAMS, mo):
-    mo.image(src=str(DIAGRAMS / "S12_The_Guardrail_Ladder_task3.png"), rounded=True)
+def _(ui):
+    ui.diagram("S12_The_Guardrail_Ladder_task3")
     return
 
 
@@ -811,8 +810,8 @@ def _(mo):
 
 
 @app.cell(hide_code=True)
-def _(DIAGRAMS, mo):
-    mo.image(src=str(DIAGRAMS / "S12_The_Guardrail_Ladder_task4.png"), rounded=True)
+def _(ui):
+    ui.diagram("S12_The_Guardrail_Ladder_task4")
     return
 
 
@@ -889,8 +888,8 @@ def _(mo):
 
 
 @app.cell(hide_code=True)
-def _(DIAGRAMS, mo):
-    mo.image(src=str(DIAGRAMS / "S12_The_Guardrail_Ladder_task5.png"), rounded=True)
+def _(ui):
+    ui.diagram("S12_The_Guardrail_Ladder_task5")
     return
 
 
@@ -956,8 +955,8 @@ def _(mo):
 
 
 @app.cell(hide_code=True)
-def _(DIAGRAMS, mo):
-    mo.image(src=str(DIAGRAMS / "S12_The_Guardrail_Ladder_task6.png"), rounded=True)
+def _(ui):
+    ui.diagram("S12_The_Guardrail_Ladder_task6")
     return
 
 
