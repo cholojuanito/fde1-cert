@@ -1646,3 +1646,38 @@ def test_injection_kwargs_requires_an_endpoint_not_just_a_model(monkeypatch, tmp
     kw = config.from_env(tmp_path).injection_kwargs()
     assert kw == {"model": "ollama_chat/qwen2.5:7b",
                   "api_base": "http://localhost:11434", "api_key": "EMPTY"}
+
+
+# ------------------------------------------------------------------ ui.diagram
+
+
+def test_a_diagram_is_embedded_not_linked(monkeypatch, tmp_path):
+    """A linked file would come through marimo's public/ service worker, which is
+    broken on a first open. The SVG has to travel inside the output, with its
+    <title> as the alt text and its own width as the cap."""
+    import base64
+
+    import marimo as mo
+
+    from helpers import ui
+
+    folder = tmp_path / "data" / "diagrams"
+    folder.mkdir(parents=True)
+    svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 300"><title>Data stays "here"</title></svg>'
+    (folder / "S1_Demo_task1.svg").write_text(svg, encoding="utf-8")
+    monkeypatch.setattr(mo, "notebook_dir", lambda: tmp_path)
+
+    markup = ui.diagram("S1_Demo_task1").text
+    assert "data:image/svg+xml;base64," + base64.b64encode(svg.encode()).decode() in markup
+    assert 'alt="Data stays &quot;here&quot;"' in markup
+    assert "max-width:960px" in markup
+
+
+def test_a_missing_diagram_fails_loudly(monkeypatch, tmp_path):
+    import marimo as mo
+
+    from helpers import ui
+
+    monkeypatch.setattr(mo, "notebook_dir", lambda: tmp_path)
+    with pytest.raises(FileNotFoundError):
+        ui.diagram("S1_Nothing_task9")

@@ -68,6 +68,17 @@ Quicklinks are here to help you **easily navigate each week's materials** for th
 | [Session 9 - Demo Day, with the critique rubric](../05_Agent_Architecture/sessions/S9_Demo_Critique_Rubric.md) | [Recording!](https://us02web.zoom.us/rec/share/B2k2V0xkdzoahopuC2kifjhugTvs2owjTF3KkIahYfF5dga3g6Ov6a5JU6DTw3MF.hH0_5nbax9XDzy4X) <br> passcode: `1yni.s*N` | [Slides](https://canva.link/xrm1agdozo9i7kg) |
 | [Session 10 - Six Ways to Call a Capability](../05_Agent_Architecture/sessions/S10_Six_Ways_to_Call_a_Capability.py) | [Recording!](https://us02web.zoom.us/rec/share/7kCBUCJ6mQ2oXFt0NJiZIwvRTmUX0EYNo5-DMTXlIh4eCWxMEJbN0oQ764djovzc.8FmORNXr3IQXmZTK) <br> passcode: `&AEr4mmZ` | [Slides](https://canva.link/n1itpi53q119stz) |
 
+## [Week 6 - Guardrails & Adversaries](../06_Guardrails/)
+
+🛤️ Break your own app on purpose — hand-written and searched attacks, then a poisoned document — close the hole, prove it stays closed, and price every rung of the guardrail ladder in latency, money and refused users
+
+**👨‍💻 [Weekly Technical Challenge](../06_Guardrails/challenge)**
+
+| 🎓 Session | ⏺️ Recording | 🖼️ Slides |
+|:-----------|:-------------|:-------------|
+| [Session 11 - Prompt Injection](../06_Guardrails/sessions/S11_Prompt_Injection.py) | Coming soon | Coming soon |
+| [Session 12 - The Guardrail Ladder](../06_Guardrails/sessions/S12_The_Guardrail_Ladder.py) | Coming soon | Coming soon |
+
 ---
 
 📖 Lost on a word? [`GLOSSARY.md`](../GLOSSARY.md) has every term the course has used so far, one sentence each, with the week it first comes up.

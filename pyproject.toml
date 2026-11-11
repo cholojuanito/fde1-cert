@@ -80,6 +80,9 @@ week4 = [
 week5 = [
     "fastmcp>=4.1",               # S10 -- the capability as an MCP server, and its client
 ]
+week6 = [
+    "nemoguardrails>=0.24",       # S12 -- the guardrail ladder as rails
+]
 
 # ---------------------------------------------------------------------------
 # torch wheels: CPU by default, and that is a real choice, not a limitation.
@@ -120,7 +123,6 @@ torch = [{ index = "pytorch" }]
 helpers-pending = [
     "adapter",      # fine-tuning
     "embeddings",   # dense retrieval -- the Week 3 bonus swap; no session imports it yet
-    "guardrails",   # guardrails
     "llm",          # the packaged model call, referenced from retrieval onward
     "memory",       # memory
     "trace",        # agent architecture
@@ -145,6 +147,7 @@ sandbox-only = [
     "pydantic",
     "deepeval",
     "fastmcp",
+    "nemoguardrails",
     # The harness sessions build the same agent three ways. Only the from-scratch
     # one runs on the root environment; the two framework notebooks pull in the
     # whole LangChain stack plus a checkpointer, which nothing else here wants and
